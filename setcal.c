@@ -1,5 +1,5 @@
 /*
- @authors:  Kolarik Cestmír, Cermak  Matous, Balusek Pavel, Hnat Filip
+ @authors:  Kolarik Cestmï¿½r, Cermak  Matous, Balusek Pavel, Hnat Filip
  @name: setcal.c
 */
 
@@ -9,21 +9,39 @@
 #include <stdbool.h>
 
 #define MAX_ROWS 1000
+#define MAX_ELEMENT_SIZE 30
 
 typedef struct{
+    Element *elementA;
+    Element *elementB;
+   char a 
+} Pair;
 
+typedef struct{
+    char value[MAX_ELEMENT_SIZE];
+} Element;
+
+typedef struct{
+//malloced array element
+    Element *elements;
+        int row;
 } Universe;
 
 typedef struct{
-
+//malloced array element
+    Element *elements;
+    int row;
 } Set;
 
 typedef struct{
-
+//malloced array element
+    Pair *elements;
+        int row;
 } Relation;
 
 typedef struct{
-
+//malloced array element
+    Element *elements;
 } Command;
 
 // --Util functions--
@@ -32,6 +50,48 @@ typedef struct{
 
 void loadFile(){
 
+}
+
+Set* searchOnRowSet(Set **setArray, int searchrow){
+    for(int i){
+        if( setarray[i]->row == searchrow){
+            
+            return &setarray[i];
+        }
+    }
+
+}
+
+
+Relation* searchOnRowRelation(Relation *set, int row){
+
+
+}
+
+void parseRow(char *string, int row, Universe* univ, Relation* rel, Command* com){
+    int index = 0;
+    int size = 0;
+    char currentChar = string[index];
+    while(currentChar != '\n'){
+        currentChar = string[index];
+        index ++;
+
+        if(currentChar == ' '){
+            size = index - size;  
+
+            Element *element = malloc(sizeof(Element));
+
+            char element[size];
+
+            stringcmp(index - size, index, &string, &element);
+
+            parseElementToUniverse();
+
+             parseElementToRelation();
+
+             parseElementToSet();
+        }
+    }
 }
 
 // --Print functions--
@@ -50,64 +110,64 @@ void printRelation(Relation*relation){
 // --Set functions--
 
 /*
-empty A - tiskne true nebo false podle toho, jestli je množina definovaná na øádku A prázdná nebo neprázdná.
+empty A - tiskne true nebo false podle toho, jestli je mnoï¿½ina definovanï¿½ na ï¿½ï¿½dku A prï¿½zdnï¿½ nebo neprï¿½zdnï¿½.
 */
 
-void empty(){
+void empty(Set* universe, Set* set1, Relation *relation){
 //TODO
 }
 
 /*
-card A - tiskne poèet prvkù v množinì A (definované na øádku A).
+card A - tiskne poï¿½et prvkï¿½ v mnoï¿½inï¿½ A (definovanï¿½ na ï¿½ï¿½dku A).
 */
 void card(){
 //TODO
 }
 
 /*
-complement A - tiskne doplnìk množiny A.
+complement A - tiskne doplnï¿½k mnoï¿½iny A.
 */
 void complement(){
 //TODO
 }
 
 /*
-union A B - tiskne sjednocení množin A a B.
+union A B - tiskne sjednocenï¿½ mnoï¿½in A a B.
 */
 void setUnion(){
 //TODO
 }
 
 /*
-intersect A B - tiskne prùnik množin A a B.
+intersect A B - tiskne prï¿½nik mnoï¿½in A a B.
 */
 void intersect(){
 //TODO
 }
 
 /*
-minus A B - tiskne rozdíl množin A \ B.
+minus A B - tiskne rozdï¿½l mnoï¿½in A \ B.
 */
 void minus(){
 //TODO
 }
 
 /*
-subseteq A B - tiskne true nebo false podle toho, jestli je množina A podmnožinou množiny B.
+subseteq A B - tiskne true nebo false podle toho, jestli je mnoï¿½ina A podmnoï¿½inou mnoï¿½iny B.
 */
 void subseteq(){
 //TODO
 }
 
 /*
-subset A B - tiskne true nebo false, jestli je množina A vlastní podmnožina množiny B.
+subset A B - tiskne true nebo false, jestli je mnoï¿½ina A vlastnï¿½ podmnoï¿½ina mnoï¿½iny B.
 */
 void subset(){
 //TODO
 }
 
 /*
-equals A B - tiskne true nebo false, jestli jsou množiny rovny.
+equals A B - tiskne true nebo false, jestli jsou mnoï¿½iny rovny.
 */
 void equals(){
 //TODO
@@ -115,70 +175,70 @@ void equals(){
 
 // --Relation functions--
 /*
-reflexive R - tiskne true nebo false, jestli je relace reflexivní.
+reflexive R - tiskne true nebo false, jestli je relace reflexivnï¿½.
 */
 void reflexive(){
 //TODO
 }
 
 /*
-symmetric R - tiskne true nebo false, jestli je relace symetrická.
+symmetric R - tiskne true nebo false, jestli je relace symetrickï¿½.
 */
 void symmetric(){
 //TODO
 }
 
 /*
-antisymmetric R - tiskne true nebo false, jestli je relace antisymetrická.
+antisymmetric R - tiskne true nebo false, jestli je relace antisymetrickï¿½.
 */
 void antisymmetric(){
 //TODO
 }
 
 /*
-transitive R - tiskne true nebo false, jestli je relace tranzitivní.
+transitive R - tiskne true nebo false, jestli je relace tranzitivnï¿½.
 */
 void transitive(){
 //TODO
 }
 
 /*
-function R - tiskne true nebo false, jestli je relace R funkcí.
+function R - tiskne true nebo false, jestli je relace R funkcï¿½.
 */
 void function(){
 //TODO
 }
 
 /*
-domain R - tiskne definièní obor funkce R (lze aplikovat i na relace - první prvky dvojic).
+domain R - tiskne definiï¿½nï¿½ obor funkce R (lze aplikovat i na relace - prvnï¿½ prvky dvojic).
 */
 void domain(){
 //TODO
 }
 
 /*
-codomain R - tiskne obor hodnot funkce R (lze aplikovat i na relace - druhé prvky dvojic).
+codomain R - tiskne obor hodnot funkce R (lze aplikovat i na relace - druhï¿½ prvky dvojic).
 */
 void codomain(){
 //TODO
 }
 
 /*
-injective R - tiskne true nebo false, jestli je funkce R injektivní.
+injective R - tiskne true nebo false, jestli je funkce R injektivnï¿½.
 */
 void injective(){
 //TODO
 }
 
 /*
-surjective R - tiskne true nebo false, jestli je funkce R surjektivní.
+surjective R - tiskne true nebo false, jestli je funkce R surjektivnï¿½.
 */
 void surjective(){
 //TODO
 }
 
 /*
-bijective R - tiskne true nebo false, jestli je funkce R bijektivní.
+bijective R - tiskne true nebo false, jestli je funkce R bijektivnï¿½.
 */
 void bijective(){
 //TODO
@@ -187,28 +247,28 @@ void bijective(){
 //Advanced commmands
 
 /*
-closure_ref R - tiskne reflexivní uzávìr relace R
+closure_ref R - tiskne reflexivnï¿½ uzï¿½vï¿½r relace R
 */
 void closureRef(){
 //TODO
 }
 
 /*
-closure_sym R - tiskne symetrický uzávìr relace R
+closure_sym R - tiskne symetrickï¿½ uzï¿½vï¿½r relace R
 */
 void closureSym(){
 //TODO
 }
 
 /*
-closure_trans R - tiskne tranzitivní uzávìr relace R
+closure_trans R - tiskne tranzitivnï¿½ uzï¿½vï¿½r relace R
 */
 void closureTrans(){
 //TODO
 }
 
 /*
-select A N - vybere náhodný prvek z množiny nebo relace A a tiskne ho. V pøípadì, že je množina A prázdná, pøeskoèí vykonávání pøíkazu na øádek N vstupního souboru. N v takovém pøípadì musí oznaèovat existující øádek ve vstupním souboru.
+select A N - vybere nï¿½hodnï¿½ prvek z mnoï¿½iny nebo relace A a tiskne ho. V pï¿½ï¿½padï¿½, ï¿½e je mnoï¿½ina A prï¿½zdnï¿½, pï¿½eskoï¿½ï¿½ vykonï¿½vï¿½nï¿½ pï¿½ï¿½kazu na ï¿½ï¿½dek N vstupnï¿½ho souboru. N v takovï¿½m pï¿½ï¿½padï¿½ musï¿½ oznaï¿½ovat existujï¿½cï¿½ ï¿½ï¿½dek ve vstupnï¿½m souboru.
 */
 void selectFromRelation(){
 //TODO
@@ -220,14 +280,44 @@ void selectFromSet(){
 
 // Arguments
 /*
-Rozšíøení všech pøíkazù, jejichž výsledkem je množina nebo relace, definuje novou množinu nebo relaci identifikovanou èíslem øádku, na kterém se nachází daná operace.
-Rozšíøení všech pøíkazù, které tisknou true nebo false o další argument N. V pøípadì, že operace konèí s výsledkem false, následující øádek, který se zpracovává, bude na øádku N (nikoliv bezprostøednì následující).
+Rozï¿½ï¿½ï¿½enï¿½ vï¿½ech pï¿½ï¿½kazï¿½, jejichï¿½ vï¿½sledkem je mnoï¿½ina nebo relace, definuje novou mnoï¿½inu nebo relaci identifikovanou ï¿½ï¿½slem ï¿½ï¿½dku, na kterï¿½m se nachï¿½zï¿½ danï¿½ operace.
+Rozï¿½ï¿½ï¿½enï¿½ vï¿½ech pï¿½ï¿½kazï¿½, kterï¿½ tisknou true nebo false o dalï¿½ï¿½ argument N. V pï¿½ï¿½padï¿½, ï¿½e operace konï¿½ï¿½ s vï¿½sledkem false, nï¿½sledujï¿½cï¿½ ï¿½ï¿½dek, kterï¿½ se zpracovï¿½vï¿½, bude na ï¿½ï¿½dku N (nikoliv bezprostï¿½ednï¿½ nï¿½sledujï¿½cï¿½).
 */
 
 int main(int argc, char const *argv[])
 {
-    //Test if project is running
+    ///Test if project is running
     printf("Hello project");
+
+    Set set = {};
+
+    Universe univ = {};
+
+    Relation rel = {};
+    
+    neco = randomArray;
+
+    Set universe = {neco, neco, neco}
+
+    Set set2 = randomArray;
+
+    neco = (Relation) randomArray;
+    Relation rel = {neco, neco};
+
+    empty(univese, set2, rel);
+
+    char input[] = "S a b c x \n";
+
+    //pavel - teammate 3 = load, parse, create structs, check elements in universe
+    //matous - teammate 4 = enable command 
+
+//ostatni
+    //teammate 1 = set functions
+    //teammate 2 = relation functions
+
+    //matous - teammate 4 = error handling, comments, print
+
+    //file -> load -> parse -> enable command -> create structs -> functions -> print
 
     //char const* const fileName = argv[1]; /* should check that argc > 1 */
     //FILE* file = fopen(fileName, "r"); /* should check the result */
