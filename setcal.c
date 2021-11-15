@@ -1,4 +1,4 @@
-//TODO header 
+//TODO header
 
 // --Util functions--
 
@@ -8,11 +8,12 @@
 
 // --Relation functions--
 
-// --Print functions-- 
+// --Print functions--
 
 
 int main(int argc, char const *argv[])
 {
     //TODO
+    printf("Hello project");
     return 0;
 }
