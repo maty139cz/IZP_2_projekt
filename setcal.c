@@ -1,5 +1,5 @@
-/*
- @authors:  Kolarik Cestmír, Cermak  Matous, Balusek Pavel, Hnat Filip
+ï»¿/*
+ @authors:  Kolarik CestmÃ­r, Cermak  Matous, Balusek Pavel, Hnat Filip
  @name: setcal.c
 */
 
@@ -9,21 +9,33 @@
 #include <stdbool.h>
 
 #define MAX_ROWS 1000
+#define MAX_ELEMENT_LENGTH 30
 
 typedef struct{
-
-} Universe;
+    int rowIndex;
+    int typeIndex;
+    char value[MAX_ELEMENT_LENGTH];
+} Element;
 
 typedef struct{
-
+    int size;
+    Element* element;
 } Set;
 
 typedef struct{
-
+    Element* valueA;
+    Element* valueB;
 } Relation;
 
 typedef struct{
+    Relation* relationA;
+    Relation* relationB;
+} Pair;
 
+typedef struct{
+    char functionName[MAX_ELEMENT_LENGTH];
+    int rowIndexA;
+    int rowIndexB;
 } Command;
 
 // --Util functions--
@@ -39,18 +51,18 @@ void printSet(Set *set){
 
 }
 
-void printUniverse(Universe *universe){
+void printUniverse(Set *universe){
 
 }
 
-void printRelation(Relation*relation){
+void printRelation(Relation *relation){
 
 }
 
 // --Set functions--
 
 /*
-empty A - tiskne true nebo false podle toho, jestli je množina definovaná na øádku A prázdná nebo neprázdná.
+empty A - tiskne true nebo false podle toho, jestli je mnoÅ¾ina definovanÃ¡ na Ã¸Ã¡dku A prÃ¡zdnÃ¡ nebo neprÃ¡zdnÃ¡.
 */
 
 void empty(){
@@ -58,56 +70,56 @@ void empty(){
 }
 
 /*
-card A - tiskne poèet prvkù v množinì A (definované na øádku A).
+card A - tiskne poÃ¨et prvkÃ¹ v mnoÅ¾inÃ¬ A (definovanÃ© na Ã¸Ã¡dku A).
 */
 void card(){
 //TODO
 }
 
 /*
-complement A - tiskne doplnìk množiny A.
+complement A - tiskne doplnÃ¬k mnoÅ¾iny A.
 */
 void complement(){
 //TODO
 }
 
 /*
-union A B - tiskne sjednocení množin A a B.
+union A B - tiskne sjednocenÃ­ mnoÅ¾in A a B.
 */
 void setUnion(){
 //TODO
 }
 
 /*
-intersect A B - tiskne prùnik množin A a B.
+intersect A B - tiskne prÃ¹nik mnoÅ¾in A a B.
 */
 void intersect(){
 //TODO
 }
 
 /*
-minus A B - tiskne rozdíl množin A \ B.
+minus A B - tiskne rozdÃ­l mnoÅ¾in A \ B.
 */
 void minus(){
 //TODO
 }
 
 /*
-subseteq A B - tiskne true nebo false podle toho, jestli je množina A podmnožinou množiny B.
+subseteq A B - tiskne true nebo false podle toho, jestli je mnoÅ¾ina A podmnoÅ¾inou mnoÅ¾iny B.
 */
 void subseteq(){
 //TODO
 }
 
 /*
-subset A B - tiskne true nebo false, jestli je množina A vlastní podmnožina množiny B.
+subset A B - tiskne true nebo false, jestli je mnoÅ¾ina A vlastnÃ­ podmnoÅ¾ina mnoÅ¾iny B.
 */
 void subset(){
 //TODO
 }
 
 /*
-equals A B - tiskne true nebo false, jestli jsou množiny rovny.
+equals A B - tiskne true nebo false, jestli jsou mnoÅ¾iny rovny.
 */
 void equals(){
 //TODO
@@ -115,70 +127,70 @@ void equals(){
 
 // --Relation functions--
 /*
-reflexive R - tiskne true nebo false, jestli je relace reflexivní.
+reflexive R - tiskne true nebo false, jestli je relace reflexivnÃ­.
 */
 void reflexive(){
 //TODO
 }
 
 /*
-symmetric R - tiskne true nebo false, jestli je relace symetrická.
+symmetric R - tiskne true nebo false, jestli je relace symetrickÃ¡.
 */
 void symmetric(){
 //TODO
 }
 
 /*
-antisymmetric R - tiskne true nebo false, jestli je relace antisymetrická.
+antisymmetric R - tiskne true nebo false, jestli je relace antisymetrickÃ¡.
 */
 void antisymmetric(){
 //TODO
 }
 
 /*
-transitive R - tiskne true nebo false, jestli je relace tranzitivní.
+transitive R - tiskne true nebo false, jestli je relace tranzitivnÃ­.
 */
 void transitive(){
 //TODO
 }
 
 /*
-function R - tiskne true nebo false, jestli je relace R funkcí.
+function R - tiskne true nebo false, jestli je relace R funkcÃ­.
 */
 void function(){
 //TODO
 }
 
 /*
-domain R - tiskne definièní obor funkce R (lze aplikovat i na relace - první prvky dvojic).
+domain R - tiskne definiÃ¨nÃ­ obor funkce R (lze aplikovat i na relace - prvnÃ­ prvky dvojic).
 */
 void domain(){
 //TODO
 }
 
 /*
-codomain R - tiskne obor hodnot funkce R (lze aplikovat i na relace - druhé prvky dvojic).
+codomain R - tiskne obor hodnot funkce R (lze aplikovat i na relace - druhÃ© prvky dvojic).
 */
 void codomain(){
 //TODO
 }
 
 /*
-injective R - tiskne true nebo false, jestli je funkce R injektivní.
+injective R - tiskne true nebo false, jestli je funkce R injektivnÃ­.
 */
 void injective(){
 //TODO
 }
 
 /*
-surjective R - tiskne true nebo false, jestli je funkce R surjektivní.
+surjective R - tiskne true nebo false, jestli je funkce R surjektivnÃ­.
 */
 void surjective(){
 //TODO
 }
 
 /*
-bijective R - tiskne true nebo false, jestli je funkce R bijektivní.
+bijective R - tiskne true nebo false, jestli je funkce R bijektivnÃ­.
 */
 void bijective(){
 //TODO
@@ -187,28 +199,28 @@ void bijective(){
 //Advanced commmands
 
 /*
-closure_ref R - tiskne reflexivní uzávìr relace R
+closure_ref R - tiskne reflexivnÃ­ uzÃ¡vÃ¬r relace R
 */
 void closureRef(){
 //TODO
 }
 
 /*
-closure_sym R - tiskne symetrický uzávìr relace R
+closure_sym R - tiskne symetrickÃ½ uzÃ¡vÃ¬r relace R
 */
 void closureSym(){
 //TODO
 }
 
 /*
-closure_trans R - tiskne tranzitivní uzávìr relace R
+closure_trans R - tiskne tranzitivnÃ­ uzÃ¡vÃ¬r relace R
 */
 void closureTrans(){
 //TODO
 }
 
 /*
-select A N - vybere náhodný prvek z množiny nebo relace A a tiskne ho. V pøípadì, že je množina A prázdná, pøeskoèí vykonávání pøíkazu na øádek N vstupního souboru. N v takovém pøípadì musí oznaèovat existující øádek ve vstupním souboru.
+select A N - vybere nÃ¡hodnÃ½ prvek z mnoÅ¾iny nebo relace A a tiskne ho. V pÃ¸Ã­padÃ¬, Å¾e je mnoÅ¾ina A prÃ¡zdnÃ¡, pÃ¸eskoÃ¨Ã­ vykonÃ¡vÃ¡nÃ­ pÃ¸Ã­kazu na Ã¸Ã¡dek N vstupnÃ­ho souboru. N v takovÃ©m pÃ¸Ã­padÃ¬ musÃ­ oznaÃ¨ovat existujÃ­cÃ­ Ã¸Ã¡dek ve vstupnÃ­m souboru.
 */
 void selectFromRelation(){
 //TODO
@@ -220,28 +232,28 @@ void selectFromSet(){
 
 // Arguments
 /*
-Rozšíøení všech pøíkazù, jejichž výsledkem je množina nebo relace, definuje novou množinu nebo relaci identifikovanou èíslem øádku, na kterém se nachází daná operace.
-Rozšíøení všech pøíkazù, které tisknou true nebo false o další argument N. V pøípadì, že operace konèí s výsledkem false, následující øádek, který se zpracovává, bude na øádku N (nikoliv bezprostøednì následující).
+RozÅ¡Ã­Ã¸enÃ­ vÅ¡ech pÃ¸Ã­kazÃ¹, jejichÅ¾ vÃ½sledkem je mnoÅ¾ina nebo relace, definuje novou mnoÅ¾inu nebo relaci identifikovanou Ã¨Ã­slem Ã¸Ã¡dku, na kterÃ©m se nachÃ¡zÃ­ danÃ¡ operace.
+RozÅ¡Ã­Ã¸enÃ­ vÅ¡ech pÃ¸Ã­kazÃ¹, kterÃ© tisknou true nebo false o dalÅ¡Ã­ argument N. V pÃ¸Ã­padÃ¬, Å¾e operace konÃ¨Ã­ s vÃ½sledkem false, nÃ¡sledujÃ­cÃ­ Ã¸Ã¡dek, kterÃ½ se zpracovÃ¡vÃ¡, bude na Ã¸Ã¡dku N (nikoliv bezprostÃ¸ednÃ¬ nÃ¡sledujÃ­cÃ­).
 */
 
-int main(int argc, char const *argv[])
+int main(int argc, char **argv[])
 {
     //Test if project is running
-    printf("Hello project");
+    printf("Hello project \n");
 
-    //char const* const fileName = argv[1]; /* should check that argc > 1 */
-    //FILE* file = fopen(fileName, "r"); /* should check the result */
-    //char line[256];
+    Element *rows[MAX_ROWS];
 
-   // while (fgets(line, sizeof(line), file)) {
-        /* note that fgets don't strip the terminating \n, checking its
-           presence would allow to handle lines longer that sizeof(line) */
-     //   printf("%s", line);
-    //}
-    /* may check feof here to make a difference between eof and io failure -- network
-       timeout for instance */
+    char* fileName = argv[1];
 
-   // fclose(file);
+    FILE* file = fopen(fileName, "r");
+
+    char c;
+
+    for(int i = 0; i < MAX_ROWS && (c = getc(file)) != EOF; i++){
+         printf("%c", c);
+    }
+
+    fclose(file);
 
     return 0;
 }
