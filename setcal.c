@@ -29,7 +29,7 @@ typedef struct{
 
 typedef struct{
     int size;
-    Pair* pairs;
+    Pair** pairs;
 } Relation;
 
 typedef struct{
@@ -332,10 +332,10 @@ int main(int argc, char **argv[])
                     if(relation->size == 0){
                         relation->pairs = (Pair*) malloc(sizeof(Pair) * DEFAULT_ELEMENT_ARRAY_LENGHT);
                     }else if(relation->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
-                        relation->pairs = (Pair*) realloc(relation->pairs, relation->size + sizeof(Pair) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+                        relation->pairs = (Pair*) realloc(relation->pairs, relation->size + sizeof(Pair*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
                     }
 
-                    relation->pairs[relation->size] = malloc(sizeof(Pair));
+                    relation->pairs[relation->size] = (Pair**) malloc(sizeof(Pair*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
                     pair = &relation->pairs[relation->size];
 
                     element = malloc(sizeof(Element));
@@ -343,44 +343,44 @@ int main(int argc, char **argv[])
 
                     relation->size++;
                 } else if(c == ')'){
-                    pair->valueB = element;
+                    pair->elementB = element;
                 }
             }else{
-                element->values[element.lenght] = c;
+                element->values[element->lenght] = c;
                 element->lenght++;
             }
         }
     }
 
-    for(int i = 0; i <= data.size && ; i++){
-        Row* row = data.rows[i];
+    for(int i = 0; i <= data->size; i++){
+        Row* row = &data->rows[i];
 
         if(row->relation != NULL){
             printf("Na radku je %d: ", i);
 
-            for(int x = 0; x < row->relation.size; x++){
-                Pair* pair = row->relation.pairs[x];
+            for(int x = 0; x < row->relation->size; x++){
+                Pair* pair = row->relation->pairs[x];
 
                 printf(" Hodnota A s%, hodnota B, cela relace je (%s %s) ",
-                       pair->valueA.values,
-                       pair->valueB.values,
-                       pair->valueA.values,
-                       pair->valueB.values);
+                       pair->elementA->values,
+                       pair->elementB->values,
+                       pair->elementA->values,
+                       pair->elementB->values);
             }
             printf("\n");
         }else if(command)
         {
             printf("Na radku je %d je prikaz: ", i);
-            for(int x = 0; x < row.set.size; x++){
-                printf("Hodnota %s ", row.set.elements.values);
+            for(int x = 0; x < row->set->size; x++){
+                printf("Hodnota %s ", row->set->elements[x]->values);
             }
 
             printf("\n");
         }
         else{
             printf("Na radku je %d je mnozina: ", i);
-            for(int x = 0; x < row.set.size; x++){
-                printf("Hodnota %s ", row.set.elements.values);
+            for(int x = 0; x < row->set->size; x++){
+                printf("Hodnota %s ", row->set->elements[x]->values);
             }
 
             printf("\n");
