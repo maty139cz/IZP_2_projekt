@@ -49,6 +49,58 @@ typedef struct{
     Row rows[MAX_ROWS];
 } Data;
 
+// --Init functions--
+Element* initElement(){
+    Element* element = malloc(sizeof(Element));
+    element->lenght = 0;
+    element->values[MAX_ELEMENT_LENGTH] = '\0';
+    return element;
+}
+
+// --Free functions--
+void freeElement(Element* element){
+    free(element);
+}
+
+void freePair(Pair* pair){
+    freeElement(pair->elementA);
+    freeElement(pair->elementB);
+    free(pair);
+}
+
+void freeReleation(Relation* relation){
+    for(int i = 0; i < relation->size; i++){
+        freePair(relation->pairs[i]);
+    }
+
+    free(relation);
+}
+
+
+void freeSet(Set* set){
+    for(int i = 0; i < set->size; i++){
+        freeElement(set->elements[i]);
+    }
+    free(set);
+}
+
+void freeData(Data* data){
+    for(int i = 0; i < data->size; i ++){
+        Row row = data->rows[i];
+
+        if(row.relation != NULL){
+            freeReleation(row.relation);
+        }
+
+        if(row.set != NULL){
+            freeSet(row.set);
+        }
+    }
+
+    free(data);
+}
+
+
 // --Util functions--
 
 // --File processing--
@@ -250,6 +302,7 @@ Rozšíøení všech pøíkazù, které tisknou true nebo false o další argume
 int main(int argc, char **argv[])
 {
     if(argc != 2){
+        fprintf(stderr, "Invalidni pocet argumentu");
         return 1;
     }
 
@@ -263,13 +316,11 @@ int main(int argc, char **argv[])
 
     char c;
 
+    Element* element = initElement();
     Relation* relation = NULL;
     Command* command = NULL;
     Set* set = NULL;
     Row* row;
-
-    Element* element = malloc(sizeof(Element));
-    element->values[MAX_ELEMENT_LENGTH] = '\0';
 
     Pair* pair = NULL;
 
@@ -278,7 +329,9 @@ int main(int argc, char **argv[])
 
     while((c = getc(file)) != EOF && data->size <= MAX_ROWS){
 
+          printf("here1");
         if(rowIndex == 0){
+      printf("here2");
             row = &data->rows[data->size];
 
             if(c == 'U' || c == 'S'){
@@ -301,18 +354,26 @@ int main(int argc, char **argv[])
             }
         }
 
+      printf("here3");
+
         if(c == '\n'){
             data->size ++;
             rowIndex = 0;
             isValid = true;
+                  printf("here4");
         }else if(isValid){
+                    printf("here5");
             if (c == ' '){
+                    printf("here6");
                 if (set == NULL) {
+                    printf("here7");
                     pair->elementA = element;
-                    element = malloc(sizeof(Element));
-                    element->values[MAX_ELEMENT_LENGTH] = '\0';
+
+                    element = initElement();
                 }else{
+                    printf("here8");
                     if(set->size == 0){
+                        printf("here8");
                         set->elements = (Element**) malloc(sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
                     }
                     if(set->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
@@ -323,12 +384,13 @@ int main(int argc, char **argv[])
                     set->size++;
                 }
 
-                element = malloc(sizeof(Element));
-                element->values[MAX_ELEMENT_LENGTH] = '\0';
+                printf("here8");
+                element = initElement();
 
                 rowIndex++;
             }else if(relation != NULL){
                 if(c == '('){
+                    printf("here8");
                     if(relation->size == 0){
                         relation->pairs = (Pair*) malloc(sizeof(Pair) * DEFAULT_ELEMENT_ARRAY_LENGHT);
                     }else if(relation->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
@@ -338,14 +400,14 @@ int main(int argc, char **argv[])
                     relation->pairs[relation->size] = (Pair**) malloc(sizeof(Pair*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
                     pair = &relation->pairs[relation->size];
 
-                    element = malloc(sizeof(Element));
-                    element->values[MAX_ELEMENT_LENGTH] = '\0';
+                    element = initElement();
 
                     relation->size++;
                 } else if(c == ')'){
                     pair->elementB = element;
                 }
             }else{
+                printf("here9");
                 element->values[element->lenght] = c;
                 element->lenght++;
             }
@@ -387,6 +449,7 @@ int main(int argc, char **argv[])
         }
     }
 
+    freeData(data);
     fclose(file);
 
     return 0;
