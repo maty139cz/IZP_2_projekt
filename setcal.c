@@ -57,6 +57,19 @@ Element* initElement(){
     return element;
 }
 
+Set* initSet(){
+    Set* set = malloc(sizeof(Set));
+    set->elements = (Element**) malloc(sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+    set->size = 0;
+    return set;
+}
+
+Data* initData(){
+    Data* data = malloc(sizeof(Data));
+    data->size = 0;
+    return data;
+}
+
 // --Free functions--
 void freeElement(Element* element){
     free(element);
@@ -75,7 +88,6 @@ void freeReleation(Relation* relation){
 
     free(relation);
 }
-
 
 void freeSet(Set* set){
     for(int i = 0; i < set->size; i++){
@@ -111,7 +123,32 @@ void loadFile(){
 
 // --Print functions--
 void printSet(Set *set){
+    printf(" \n Set size %d \n", set->size);
+    for(int x = 0; x < set->size; x++){
+        printf("Hodnota %s, ", set->elements[x]->values);
+    }
 
+    printf("\n");
+}
+
+void printData(Data* data){
+    for(int i = 0; i <= data->size; i++){
+        Row row = data->rows[i];
+
+        if(row.relation != NULL){
+            printf("Na radku %d je relation: ", i);
+            printRelation(row.relation);
+        }else if(row.set != NULL){
+            if(row.command)
+            {
+                printf("Na radku je %d je prikaz: ", i);
+                printSet(row.set);
+            }else{
+                printf("Na radku je %d je mnozina: ", i);
+                printSet(row.set);
+            }
+        }
+    }
 }
 
 void printUniverse(Set *universe){
@@ -119,7 +156,16 @@ void printUniverse(Set *universe){
 }
 
 void printRelation(Relation *relation){
+    for(int x = 0; x < relation->size; x++){
+        Pair* pair = relation->pairs[x];
 
+        printf(" Hodnota A s%, hodnota B, cela relace je (%s %s) ",
+        pair->elementA->values,
+        pair->elementB->values,
+        pair->elementA->values,
+        pair->elementB->values);
+    }
+    printf("\n");
 }
 
 // --Set functions--
@@ -302,15 +348,14 @@ Rozšíøení všech pøíkazù, které tisknou true nebo false o další argume
 int main(int argc, char **argv[])
 {
     if(argc != 2){
-        fprintf(stderr, "Invalidni pocet argumentu");
+        fprintf(stderr, "Invalidni pocet argumentu. \n");
         return 1;
     }
 
-    //Test if project is running
-    Data* data = malloc(sizeof(Data));
-    data->size = 0;
-
     char* fileName = argv[1];
+
+    //Test if project is running
+    Data* data = initData();
 
     FILE* file = fopen(fileName, "r");
 
@@ -320,7 +365,7 @@ int main(int argc, char **argv[])
     Relation* relation = NULL;
     Command* command = NULL;
     Set* set = NULL;
-    Row* row;
+    Row* row = NULL;
 
     Pair* pair = NULL;
 
@@ -329,17 +374,16 @@ int main(int argc, char **argv[])
 
     while((c = getc(file)) != EOF && data->size <= MAX_ROWS){
 
-          printf("here1");
         if(rowIndex == 0){
-      printf("here2");
             row = &data->rows[data->size];
 
             if(c == 'U' || c == 'S'){
                 if(c == 'C'){
                     row->command = true;
                 }
+
                 row->relation = NULL;
-                row->set = malloc(sizeof(Set));
+                row->set = initSet();
 
                 relation = NULL;
                 set = row->set;
@@ -352,31 +396,30 @@ int main(int argc, char **argv[])
             }else{
                 isValid = false;
             }
+
+            rowIndex++;
+            continue;
         }
 
-      printf("here3");
+      printf("%c \n", c);
+      if(rowIndex < 2 && c == ' '){
+            printf("here4\n");
+            rowIndex++;
+            continue;
+      }
 
         if(c == '\n'){
             data->size ++;
             rowIndex = 0;
             isValid = true;
-                  printf("here4");
         }else if(isValid){
-                    printf("here5");
             if (c == ' '){
-                    printf("here6");
+                printf("here2\n");
                 if (set == NULL) {
-                    printf("here7");
                     pair->elementA = element;
-
-                    element = initElement();
                 }else{
-                    printf("here8");
-                    if(set->size == 0){
-                        printf("here8");
-                        set->elements = (Element**) malloc(sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
-                    }
-                    if(set->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
+                    if(set->size > 0 && set->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
+                        printf("here10\n");
                         set->elements = (Element**) realloc(set->elements, set->size + sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
                     }
 
@@ -384,11 +427,14 @@ int main(int argc, char **argv[])
                     set->size++;
                 }
 
-                printf("here8");
+                if(element->lenght < MAX_ELEMENT_LENGTH){
+                    element->values[element->lenght + 1] = '\0';
+                }
+
                 element = initElement();
 
                 rowIndex++;
-            }else if(relation != NULL){
+            /*}else if(relation != NULL){
                 if(c == '('){
                     printf("here8");
                     if(relation->size == 0){
@@ -405,49 +451,16 @@ int main(int argc, char **argv[])
                     relation->size++;
                 } else if(c == ')'){
                     pair->elementB = element;
-                }
+                }*/
             }else{
-                printf("here9");
+                printf("here3\n");
                 element->values[element->lenght] = c;
                 element->lenght++;
             }
         }
     }
 
-    for(int i = 0; i <= data->size; i++){
-        Row* row = &data->rows[i];
-
-        if(row->relation != NULL){
-            printf("Na radku je %d: ", i);
-
-            for(int x = 0; x < row->relation->size; x++){
-                Pair* pair = row->relation->pairs[x];
-
-                printf(" Hodnota A s%, hodnota B, cela relace je (%s %s) ",
-                       pair->elementA->values,
-                       pair->elementB->values,
-                       pair->elementA->values,
-                       pair->elementB->values);
-            }
-            printf("\n");
-        }else if(command)
-        {
-            printf("Na radku je %d je prikaz: ", i);
-            for(int x = 0; x < row->set->size; x++){
-                printf("Hodnota %s ", row->set->elements[x]->values);
-            }
-
-            printf("\n");
-        }
-        else{
-            printf("Na radku je %d je mnozina: ", i);
-            for(int x = 0; x < row->set->size; x++){
-                printf("Hodnota %s ", row->set->elements[x]->values);
-            }
-
-            printf("\n");
-        }
-    }
+    printData(data);
 
     freeData(data);
     fclose(file);

@@ -1,4 +1,5 @@
 U a b c x y z
+S dad mom girl boy man woman
 S a b c x
 S x y z
 C intersect 2 3
