@@ -10,33 +10,44 @@
 
 #define MAX_ROWS 1000
 #define MAX_ELEMENT_LENGTH 30
+#define DEFAULT_ELEMENT_ARRAY_LENGHT 10
 
 typedef struct{
-    int rowIndex;
-    int typeIndex;
-    char value[MAX_ELEMENT_LENGTH];
+    int lenght;
+    char values[MAX_ELEMENT_LENGTH + 1];
 } Element;
 
 typedef struct{
     int size;
-    Element* element;
+    Element** elements;
 } Set;
 
 typedef struct{
-    Element* valueA;
-    Element* valueB;
-} Relation;
+    Element* elementA;
+    Element* elementB;
+} Pair;
 
 typedef struct{
-    Relation* relationA;
-    Relation* relationB;
-} Pair;
+    int size;
+    Pair* pairs;
+} Relation;
 
 typedef struct{
     char functionName[MAX_ELEMENT_LENGTH];
     int rowIndexA;
     int rowIndexB;
 } Command;
+
+typedef struct{
+    Set* set;
+    Relation* relation;
+    bool command;
+} Row;
+
+typedef struct{
+    int size;
+    Row rows[MAX_ROWS];
+} Data;
 
 // --Util functions--
 
@@ -238,10 +249,13 @@ Rozšíøení všech pøíkazù, které tisknou true nebo false o další argume
 
 int main(int argc, char **argv[])
 {
-    //Test if project is running
-    printf("Hello project \n");
+    if(argc != 2){
+        return 1;
+    }
 
-    Element *rows[MAX_ROWS];
+    //Test if project is running
+    Data* data = malloc(sizeof(Data));
+    data->size = 0;
 
     char* fileName = argv[1];
 
@@ -249,8 +263,128 @@ int main(int argc, char **argv[])
 
     char c;
 
-    for(int i = 0; i < MAX_ROWS && (c = getc(file)) != EOF; i++){
-         printf("%c", c);
+    Relation* relation = NULL;
+    Command* command = NULL;
+    Set* set = NULL;
+    Row* row;
+
+    Element* element = malloc(sizeof(Element));
+    element->values[MAX_ELEMENT_LENGTH] = '\0';
+
+    Pair* pair = NULL;
+
+    int rowIndex = 0;
+    bool isValid = true;
+
+    while((c = getc(file)) != EOF && data->size <= MAX_ROWS){
+
+        if(rowIndex == 0){
+            row = &data->rows[data->size];
+
+            if(c == 'U' || c == 'S'){
+                if(c == 'C'){
+                    row->command = true;
+                }
+                row->relation = NULL;
+                row->set = malloc(sizeof(Set));
+
+                relation = NULL;
+                set = row->set;
+            }else if(c == 'R'){
+                row->relation = malloc(sizeof(Relation));
+                row->set = NULL;
+
+                set = NULL;
+                relation = row->relation;
+            }else{
+                isValid = false;
+            }
+        }
+
+        if(c == '\n'){
+            data->size ++;
+            rowIndex = 0;
+            isValid = true;
+        }else if(isValid){
+            if (c == ' '){
+                if (set == NULL) {
+                    pair->elementA = element;
+                    element = malloc(sizeof(Element));
+                    element->values[MAX_ELEMENT_LENGTH] = '\0';
+                }else{
+                    if(set->size == 0){
+                        set->elements = (Element**) malloc(sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+                    }
+                    if(set->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
+                        set->elements = (Element**) realloc(set->elements, set->size + sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+                    }
+
+                    set->elements[set->size] = element;
+                    set->size++;
+                }
+
+                element = malloc(sizeof(Element));
+                element->values[MAX_ELEMENT_LENGTH] = '\0';
+
+                rowIndex++;
+            }else if(relation != NULL){
+                if(c == '('){
+                    if(relation->size == 0){
+                        relation->pairs = (Pair*) malloc(sizeof(Pair) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+                    }else if(relation->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
+                        relation->pairs = (Pair*) realloc(relation->pairs, relation->size + sizeof(Pair) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+                    }
+
+                    relation->pairs[relation->size] = malloc(sizeof(Pair));
+                    pair = &relation->pairs[relation->size];
+
+                    element = malloc(sizeof(Element));
+                    element->values[MAX_ELEMENT_LENGTH] = '\0';
+
+                    relation->size++;
+                } else if(c == ')'){
+                    pair->valueB = element;
+                }
+            }else{
+                element->values[element.lenght] = c;
+                element->lenght++;
+            }
+        }
+    }
+
+    for(int i = 0; i <= data.size && ; i++){
+        Row* row = data.rows[i];
+
+        if(row->relation != NULL){
+            printf("Na radku je %d: ", i);
+
+            for(int x = 0; x < row->relation.size; x++){
+                Pair* pair = row->relation.pairs[x];
+
+                printf(" Hodnota A s%, hodnota B, cela relace je (%s %s) ",
+                       pair->valueA.values,
+                       pair->valueB.values,
+                       pair->valueA.values,
+                       pair->valueB.values);
+            }
+            printf("\n");
+        }else if(command)
+        {
+            printf("Na radku je %d je prikaz: ", i);
+            for(int x = 0; x < row.set.size; x++){
+                printf("Hodnota %s ", row.set.elements.values);
+            }
+
+            printf("\n");
+        }
+        else{
+            printf("Na radku je %d je mnozina: ", i);
+            for(int x = 0; x < row.set.size; x++){
+                printf("Hodnota %s ", row.set.elements.values);
+            }
+
+            printf("\n");
+        }
     }
 
     fclose(file);
