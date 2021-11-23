@@ -6,6 +6,7 @@
 //Basic libraries.
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 
 #define MAX_ROWS 1000
@@ -57,12 +58,38 @@ Element* initElement(){
     return element;
 }
 
+void addSetElement(Set* set, Element* element){
+
+    if(element->lenght < MAX_ELEMENT_LENGTH){
+        element->values[element->lenght + 1] = '\0';
+    }
+
+    if(set->size > 0 && set->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
+        set->elements = (Element**) realloc(set->elements, set->size + sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+    }
+
+    set->elements[set->size] = element;
+    set->size++;
+
+    set->elements[set->size] = initElement();
+}
+
+Pair* addRelationPair(Relation* relation){
+    return NULL;
+}
+
 Set* initSet(){
     Set* set = malloc(sizeof(Set));
     set->elements = (Element**) malloc(sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
     set->size = 0;
+    set->elements[0] = NULL;
     return set;
 }
+
+Relation* initRelation(){
+    return NULL;
+}
+
 
 Data* initData(){
     Data* data = malloc(sizeof(Data));
@@ -112,23 +139,162 @@ void freeData(Data* data){
     free(data);
 }
 
-
 // --Util functions--
 
-// --File processing--
+//Returns if set has ended
+bool parseToSet(Set* set, char c){
+    Element* element = set->elements[set->size];
 
-void loadFile(){
+    if (c == ' ' || c == '\n'){
+        if(element != NULL){
+            addSetElement(set, element);
+        }
 
+        if(c == '\n'){
+            return true;
+        }else{
+            set->elements[set->size] = initElement();
+        }
+    }else {
+        element->values[element->lenght] = c;
+        element->lenght++;
+    }
+
+    return false;
+}
+
+Command* parseSetToCommand(Set* set){
+    Command* command = malloc(sizeof(Command));
+    if(set->size > 0){
+        strcpy(&command->functionName, &set->elements[0]->values) ;
+
+        if(set->size > 1){
+            command->rowIndexA = atoi(&set->elements[1]->values);
+        }else{
+            command->rowIndexA = 0;
+        }
+
+        if(set->size > 2){
+            command->rowIndexB = atoi(&set->elements[2]->values);
+        }else{
+            command->rowIndexA = 0;
+        }
+    }
+
+    return command;
+}
+
+bool parseToRelation(Relation* set, char c){
+                    /*}else if(relation != NULL){
+                if(c == '('){
+                    printf("here8");
+                    if(relation->size == 0){
+                        relation->pairs = (Pair*) malloc(sizeof(Pair) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+                    }else if(relation->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
+                        relation->pairs = (Pair*) realloc(relation->pairs, relation->size + sizeof(Pair*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+                    }
+
+                    relation->pairs[relation->size] = (Pair**) malloc(sizeof(Pair*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+                    pair = &relation->pairs[relation->size];
+
+                    element = initElement();
+
+                    relation->size++;
+                } else if(c == ')'){
+                    pair->elementB = element;
+                }*/
+    return false;
+}
+
+// --Data processing--
+
+void activateCommand(Command* command, Data* data){
+    Row* row1 = NULL;
+    Row* row2 = NULL;
+    if(command->rowIndexA != 0){
+        row1 = &data->rows[command->rowIndexA];
+    }
+
+    if(command->rowIndexB != 0){
+        row2 = &data->rows[command->rowIndexB];
+    }
+
+    printf("Prikaz");
+    printCommand(command);
+    printf("plati pro mnozinu: \n");
+
+    if(row1 != NULL && row1->set != NULL && !row1->command){
+        printSet(row1->set);
+    }
+
+    if(row2 != NULL && row2->set != NULL && !row2->command){
+        printf(" a zaroven \n");
+        printSet(row2->set);
+    }
+}
+
+void loadFileData(FILE* file, Data* data){
+    char c;
+    Relation* relation = NULL;
+    Command* command = NULL;
+    Set* set = NULL;
+    Row* row = NULL;
+    Pair* pair = NULL;
+
+    bool first = true;
+
+    while((c = getc(file)) != EOF && data->size <= MAX_ROWS){
+
+        if(first){
+            row = &data->rows[data->size];
+
+            if(c == 'U' || c == 'S' || c == 'C'){
+                if(c == 'C'){
+                    row->command = true;
+                }
+
+                relation = NULL;
+                set = initSet();
+            }else if(c == 'R'){
+                row->relation = malloc(sizeof(Relation));
+                row->set = NULL;
+
+                set = NULL;
+                relation = initRelation();
+            }
+
+            row->relation = relation;
+            row->set = set;
+
+            first = false;
+            continue;
+        }
+
+        printf("%c \n", c);
+
+        if(relation != NULL){
+            first = parseToRelation(relation, c);
+        }else{
+            first = parseToSet(set, c);
+        }
+
+        if(first){
+            data->size++;
+        }
+    }
 }
 
 // --Print functions--
 void printSet(Set *set){
-    printf(" \n Set size %d \n", set->size);
     for(int x = 0; x < set->size; x++){
-        printf("Hodnota %s, ", set->elements[x]->values);
+        printf(" %s, ", set->elements[x]->values);
     }
 
     printf("\n");
+}
+
+void printCommand(Command *command){
+    printf("Prikaz %s, na radce %d a %d \n", command->functionName, command->rowIndexA, command->rowIndexB);
 }
 
 void printData(Data* data){
@@ -141,8 +307,9 @@ void printData(Data* data){
         }else if(row.set != NULL){
             if(row.command)
             {
+                Command* command = parseSetToCommand(row.set);
                 printf("Na radku je %d je prikaz: ", i);
-                printSet(row.set);
+                printCommand(command);
             }else{
                 printf("Na radku je %d je mnozina: ", i);
                 printSet(row.set);
@@ -359,108 +526,18 @@ int main(int argc, char **argv[])
 
     FILE* file = fopen(fileName, "r");
 
-    char c;
-
-    Element* element = initElement();
-    Relation* relation = NULL;
-    Command* command = NULL;
-    Set* set = NULL;
-    Row* row = NULL;
-
-    Pair* pair = NULL;
-
-    int rowIndex = 0;
-    bool isValid = true;
-
-    while((c = getc(file)) != EOF && data->size <= MAX_ROWS){
-
-        if(rowIndex == 0){
-            row = &data->rows[data->size];
-
-            if(c == 'U' || c == 'S'){
-                if(c == 'C'){
-                    row->command = true;
-                }
-
-                row->relation = NULL;
-                row->set = initSet();
-
-                relation = NULL;
-                set = row->set;
-            }else if(c == 'R'){
-                row->relation = malloc(sizeof(Relation));
-                row->set = NULL;
-
-                set = NULL;
-                relation = row->relation;
-            }else{
-                isValid = false;
-            }
-
-            rowIndex++;
-            continue;
-        }
-
-      printf("%c \n", c);
-      if(rowIndex < 2 && c == ' '){
-            printf("here4\n");
-            rowIndex++;
-            continue;
-      }
-
-        if(c == '\n'){
-            data->size ++;
-            rowIndex = 0;
-            isValid = true;
-        }else if(isValid){
-            if (c == ' '){
-                printf("here2\n");
-                if (set == NULL) {
-                    pair->elementA = element;
-                }else{
-                    if(set->size > 0 && set->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
-                        printf("here10\n");
-                        set->elements = (Element**) realloc(set->elements, set->size + sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
-                    }
-
-                    set->elements[set->size] = element;
-                    set->size++;
-                }
-
-                if(element->lenght < MAX_ELEMENT_LENGTH){
-                    element->values[element->lenght + 1] = '\0';
-                }
-
-                element = initElement();
-
-                rowIndex++;
-            /*}else if(relation != NULL){
-                if(c == '('){
-                    printf("here8");
-                    if(relation->size == 0){
-                        relation->pairs = (Pair*) malloc(sizeof(Pair) * DEFAULT_ELEMENT_ARRAY_LENGHT);
-                    }else if(relation->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
-                        relation->pairs = (Pair*) realloc(relation->pairs, relation->size + sizeof(Pair*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
-                    }
-
-                    relation->pairs[relation->size] = (Pair**) malloc(sizeof(Pair*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
-                    pair = &relation->pairs[relation->size];
-
-                    element = initElement();
-
-                    relation->size++;
-                } else if(c == ')'){
-                    pair->elementB = element;
-                }*/
-            }else{
-                printf("here3\n");
-                element->values[element->lenght] = c;
-                element->lenght++;
-            }
-        }
-    }
+    loadFileData(file, data);
 
     printData(data);
+
+    for(int i = 0; i < data->size; i ++){
+        Row* row = &data->rows[i];
+        if(row->set != NULL && row->command){
+            Command* command = parseSetToCommand(row->set);
+            activateCommand(command, data);
+
+        }
+    }
 
     freeData(data);
     fclose(file);
