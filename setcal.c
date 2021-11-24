@@ -13,59 +13,70 @@
 #define MAX_ELEMENT_LENGTH 30
 #define DEFAULT_ELEMENT_ARRAY_LENGHT 10
 
-typedef struct{
+typedef struct
+{
     int lenght;
     char values[MAX_ELEMENT_LENGTH + 1];
 } Element;
 
-typedef struct{
+typedef struct
+{
     int size;
-    Element** elements;
+    Element **elements;
 } Set;
 
-typedef struct{
-    Element* elementA;
-    Element* elementB;
+typedef struct
+{
+    Element *elementA;
+    Element *elementB;
 } Pair;
 
-typedef struct{
+typedef struct
+{
     int size;
-    Pair** pairs;
+    Pair **pairs;
 } Relation;
 
-typedef struct{
+typedef struct
+{
     char functionName[MAX_ELEMENT_LENGTH];
     int rowIndexA;
     int rowIndexB;
 } Command;
 
-typedef struct{
-    Set* set;
-    Relation* relation;
+typedef struct
+{
+    Set *set;
+    Relation *relation;
     bool command;
 } Row;
 
-typedef struct{
+typedef struct
+{
     int size;
     Row rows[MAX_ROWS];
 } Data;
 
 // --Init functions--
-Element* initElement(){
-    Element* element = malloc(sizeof(Element));
+Element *initElement()
+{
+    Element *element = malloc(sizeof(Element));
     element->lenght = 0;
     element->values[MAX_ELEMENT_LENGTH] = '\0';
     return element;
 }
 
-void addSetElement(Set* set, Element* element){
+void addSetElement(Set *set, Element *element)
+{
 
-    if(element->lenght < MAX_ELEMENT_LENGTH){
+    if (element->lenght < MAX_ELEMENT_LENGTH)
+    {
         element->values[element->lenght + 1] = '\0';
     }
 
-    if(set->size > 0 && set->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
-        set->elements = (Element**) realloc(set->elements, set->size + sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+    if (set->size > 0 && set->size % DEFAULT_ELEMENT_ARRAY_LENGHT)
+    {
+        set->elements = (Element **)realloc(set->elements, set->size + sizeof(Element *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
     }
 
     set->elements[set->size] = element;
@@ -74,64 +85,77 @@ void addSetElement(Set* set, Element* element){
     set->elements[set->size] = initElement();
 }
 
-Pair* addRelationPair(Relation* relation){
+Pair *addRelationPair(Relation *relation)
+{
     return NULL;
 }
 
-Set* initSet(){
-    Set* set = malloc(sizeof(Set));
-    set->elements = (Element**) malloc(sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+Set *initSet()
+{
+    Set *set = malloc(sizeof(Set));
+    set->elements = (Element **)malloc(sizeof(Element *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
     set->size = 0;
     set->elements[0] = NULL;
     return set;
 }
 
-Relation* initRelation(){
+Relation *initRelation()
+{
     return NULL;
 }
 
-
-Data* initData(){
-    Data* data = malloc(sizeof(Data));
+Data *initData()
+{
+    Data *data = malloc(sizeof(Data));
     data->size = 0;
     return data;
 }
 
 // --Free functions--
-void freeElement(Element* element){
+void freeElement(Element *element)
+{
     free(element);
 }
 
-void freePair(Pair* pair){
+void freePair(Pair *pair)
+{
     freeElement(pair->elementA);
     freeElement(pair->elementB);
     free(pair);
 }
 
-void freeReleation(Relation* relation){
-    for(int i = 0; i < relation->size; i++){
+void freeReleation(Relation *relation)
+{
+    for (int i = 0; i < relation->size; i++)
+    {
         freePair(relation->pairs[i]);
     }
 
     free(relation);
 }
 
-void freeSet(Set* set){
-    for(int i = 0; i < set->size; i++){
+void freeSet(Set *set)
+{
+    for (int i = 0; i < set->size; i++)
+    {
         freeElement(set->elements[i]);
     }
     free(set);
 }
 
-void freeData(Data* data){
-    for(int i = 0; i < data->size; i ++){
+void freeData(Data *data)
+{
+    for (int i = 0; i < data->size; i++)
+    {
         Row row = data->rows[i];
 
-        if(row.relation != NULL){
+        if (row.relation != NULL)
+        {
             freeReleation(row.relation);
         }
 
-        if(row.set != NULL){
+        if (row.set != NULL)
+        {
             freeSet(row.set);
         }
     }
@@ -142,20 +166,28 @@ void freeData(Data* data){
 // --Util functions--
 
 //Returns if set has ended
-bool parseToSet(Set* set, char c){
-    Element* element = set->elements[set->size];
+bool parseToSet(Set *set, char c)
+{
+    Element *element = set->elements[set->size];
 
-    if (c == ' ' || c == '\n'){
-        if(element != NULL){
+    if (c == ' ' || c == '\n')
+    {
+        if (element != NULL)
+        {
             addSetElement(set, element);
         }
 
-        if(c == '\n'){
+        if (c == '\n')
+        {
             return true;
-        }else{
+        }
+        else
+        {
             set->elements[set->size] = initElement();
         }
-    }else {
+    }
+    else
+    {
         element->values[element->lenght] = c;
         element->lenght++;
     }
@@ -163,20 +195,28 @@ bool parseToSet(Set* set, char c){
     return false;
 }
 
-Command* parseSetToCommand(Set* set){
-    Command* command = malloc(sizeof(Command));
-    if(set->size > 0){
-        strcpy(&command->functionName, &set->elements[0]->values) ;
+Command *parseSetToCommand(Set *set)
+{
+    Command *command = malloc(sizeof(Command));
+    if (set->size > 0)
+    {
+        strcpy(&command->functionName, &set->elements[0]->values);
 
-        if(set->size > 1){
+        if (set->size > 1)
+        {
             command->rowIndexA = atoi(&set->elements[1]->values);
-        }else{
+        }
+        else
+        {
             command->rowIndexA = 0;
         }
 
-        if(set->size > 2){
+        if (set->size > 2)
+        {
             command->rowIndexB = atoi(&set->elements[2]->values);
-        }else{
+        }
+        else
+        {
             command->rowIndexA = 0;
         }
     }
@@ -184,8 +224,9 @@ Command* parseSetToCommand(Set* set){
     return command;
 }
 
-bool parseToRelation(Relation* set, char c){
-                    /*}else if(relation != NULL){
+bool parseToRelation(Relation *set, char c)
+{
+    /*}else if(relation != NULL){
                 if(c == '('){
                     printf("here8");
                     if(relation->size == 0){
@@ -208,18 +249,21 @@ bool parseToRelation(Relation* set, char c){
 
 // --Data processing--
 
-void activateCommand(Command* command, Data* data){
-    Row* row1 = NULL;
-    Row* row2 = NULL;
-    if(command->rowIndexA != 0){
+void activateCommand(Command *command, Data *data)
+{
+    Row *row1 = NULL;
+    Row *row2 = NULL;
+    if (command->rowIndexA != 0)
+    {
         row1 = &data->rows[command->rowIndexA];
     }
 
-    if(command->rowIndexB != 0){
+    if (command->rowIndexB != 0)
+    {
         row2 = &data->rows[command->rowIndexB];
     }
-    //control print 
-   /* printf("Prikaz");
+    //control print
+    /* printf("Prikaz");
     printCommand(command);
     printf("plati pro mnozinu: \n");
 
@@ -230,33 +274,40 @@ void activateCommand(Command* command, Data* data){
     if(row2 != NULL && row2->set != NULL && !row2->command){
         printf(" a zaroven \n");
         printSet(row2->set);
-        */
-    }
+       
+    }*/
 }
 
-void loadFileData(FILE* file, Data* data){
+void loadFileData(FILE *file, Data *data)
+{
     char c;
-    Relation* relation = NULL;
-    Command* command = NULL;
-    Set* set = NULL;
-    Row* row = NULL;
-    Pair* pair = NULL;
+    Relation *relation = NULL;
+    Command *command = NULL;
+    Set *set = NULL;
+    Row *row = NULL;
+    Pair *pair = NULL;
 
     bool first = true;
 
-    while((c = getc(file)) != EOF && data->size <= MAX_ROWS){
+    while ((c = getc(file)) != EOF && data->size <= MAX_ROWS)
+    {
 
-        if(first){
+        if (first)
+        {
             row = &data->rows[data->size];
 
-            if(c == 'U' || c == 'S' || c == 'C'){
-                if(c == 'C'){
+            if (c == 'U' || c == 'S' || c == 'C')
+            {
+                if (c == 'C')
+                {
                     row->command = true;
                 }
 
                 relation = NULL;
                 set = initSet();
-            }else if(c == 'R'){
+            }
+            else if (c == 'R')
+            {
                 row->relation = malloc(sizeof(Relation));
                 row->set = NULL;
 
@@ -271,206 +322,243 @@ void loadFileData(FILE* file, Data* data){
             continue;
         }
 
-        printf("%c \n", c);
+        // printf("%c \n", c);
 
-        if(relation != NULL){
+        if (relation != NULL)
+        {
             first = parseToRelation(relation, c);
-        }else{
+        }
+        else
+        {
             first = parseToSet(set, c);
         }
 
-        if(first){
+        if (first)
+        {
             data->size++;
         }
     }
 }
 
 // --Print functions--
-void printSet(Set *set){
-    for(int x = 0; x < set->size; x++){
+void printSet(Set *set)
+{
+    for (int x = 0; x < set->size; x++)
+    {
         printf(" %s, ", set->elements[x]->values);
     }
 
     printf("\n");
 }
 
-void printCommand(Command *command){
+void printCommand(Command *command)
+{
     printf("Prikaz %s, na radce %d a %d \n", command->functionName, command->rowIndexA, command->rowIndexB);
 }
 
-void printData(Data* data){
-    for(int i = 0; i <= data->size; i++){
+void printData(Data *data)
+{
+    for (int i = 0; i <= data->size; i++)
+    {
         Row row = data->rows[i];
 
-        if(row.relation != NULL){
+        if (row.relation != NULL)
+        {
             printf("Na radku %d je relation: ", i);
             printRelation(row.relation);
-        }else if(row.set != NULL){
-            if(row.command)
+        }
+        else if (row.set != NULL)
+        {
+            if (row.command)
             {
-                Command* command = parseSetToCommand(row.set);
-                printf("Na radku je %d je prikaz: ", i);
-                printCommand(command);
-            }else{
-                printf("Na radku je %d je mnozina: ", i);
-                printSet(row.set);
+                Command *command = parseSetToCommand(row.set);
+                //printf("Na radku je %d je prikaz: ", i);
+                //printCommand(command);
+            }
+            else
+            {
+                //printf("Na radku je %d je mnozina: ", i);
+                //printSet(row.set);
             }
         }
     }
 }
 
-void printUniverse(Set *universe){
-
+void printUniverse(Set *universe)
+{
 }
 
-void printRelation(Relation *relation){
-    for(int x = 0; x < relation->size; x++){
-        Pair* pair = relation->pairs[x];
+void printRelation(Relation *relation)
+{
+    for (int x = 0; x < relation->size; x++)
+    {
+        Pair *pair = relation->pairs[x];
 
         printf(" Hodnota A %s, hodnota B %s, cela relace je (%s %s) ",
-        pair->elementA->values,
-        pair->elementB->values,
-        pair->elementA->values,
-        pair->elementB->values);
+               pair->elementA->values,
+               pair->elementB->values,
+               pair->elementA->values,
+               pair->elementB->values);
     }
     printf("\n");
 }
-
+//Command lookup tables
+ 
 // --Set functions--
 
 /*
 empty A - tiskne true nebo false podle toho, jestli je množina definovaná na øádku A prázdná nebo neprázdná.
 */
 
-void empty(){
-//TODO
+void empty(Set *set)
+{
+    //TODO
+    printf("empty");
 }
 
 /*
 card A - tiskne poèet prvkù v množinì A (definované na øádku A).
 */
-void card(){
-//TODO
+void card()
+{
+    //TODO
 }
 
 /*
 complement A - tiskne doplnìk množiny A.
 */
-void complement(){
-//TODO
+void complement()
+{
+    //TODO
 }
 
 /*
 union A B - tiskne sjednocení množin A a B.
 */
-void setUnion(){
-//TODO
+void setUnion()
+{
+    //TODO
 }
 
 /*
 intersect A B - tiskne prùnik množin A a B.
 */
-void intersect(){
-//TODO
+void intersect()
+{
+    //TODO
 }
 
 /*
 minus A B - tiskne rozdíl množin A \ B.
 */
-void minus(){
-//TODO
+void minus()
+{
+    //TODO
 }
 
 /*
 subseteq A B - tiskne true nebo false podle toho, jestli je množina A podmnožinou množiny B.
 */
-void subseteq(){
-//TODO
+void subseteq()
+{
+    //TODO
 }
 
 /*
 subset A B - tiskne true nebo false, jestli je množina A vlastní podmnožina množiny B.
 */
-void subset(){
-//TODO
+void subset()
+{
+    //TODO
 }
 
 /*
 equals A B - tiskne true nebo false, jestli jsou množiny rovny.
 */
-void equals(){
-//TODO
+void equals()
+{
+    //TODO
 }
 
 // --Relation functions--
 /*
 reflexive R - tiskne true nebo false, jestli je relace reflexivní.
 */
-void reflexive(){
-//TODO
+void reflexive()
+{
+    //TODO
 }
 
 /*
 symmetric R - tiskne true nebo false, jestli je relace symetrická.
 */
-void symmetric(){
-//TODO
+void symmetric()
+{
+    //TODO
 }
 
 /*
 antisymmetric R - tiskne true nebo false, jestli je relace antisymetrická.
 */
-void antisymmetric(){
-//TODO
+void antisymmetric()
+{
+    //TODO
 }
 
 /*
 transitive R - tiskne true nebo false, jestli je relace tranzitivní.
 */
-void transitive(){
-//TODO
+void transitive()
+{
+    //TODO
 }
 
 /*
 function R - tiskne true nebo false, jestli je relace R funkcí.
 */
-void function(){
-//TODO
+void function()
+{
+    //TODO
 }
 
 /*
 domain R - tiskne definièní obor funkce R (lze aplikovat i na relace - první prvky dvojic).
 */
-void domain(){
-//TODO
+void domain()
+{
+    //TODO
 }
 
 /*
 codomain R - tiskne obor hodnot funkce R (lze aplikovat i na relace - druhé prvky dvojic).
 */
-void codomain(){
-//TODO
+void codomain()
+{
+    //TODO
 }
 
 /*
 injective R - tiskne true nebo false, jestli je funkce R injektivní.
 */
-void injective(){
-//TODO
+void injective()
+{
+    //TODO
 }
 
 /*
 surjective R - tiskne true nebo false, jestli je funkce R surjektivní.
 */
-void surjective(){
-//TODO
+void surjective()
+{
+    //TODO
 }
 
 /*
 bijective R - tiskne true nebo false, jestli je funkce R bijektivní.
 */
-void bijective(){
-//TODO
+void bijective()
+{
+    //TODO
 }
 
 //Advanced commmands
@@ -478,33 +566,80 @@ void bijective(){
 /*
 closure_ref R - tiskne reflexivní uzávìr relace R
 */
-void closureRef(){
-//TODO
+void closureRef()
+{
+    //TODO
 }
 
 /*
 closure_sym R - tiskne symetrický uzávìr relace R
 */
-void closureSym(){
-//TODO
+void closureSym()
+{
+    //TODO
 }
 
 /*
 closure_trans R - tiskne tranzitivní uzávìr relace R
 */
-void closureTrans(){
-//TODO
+void closureTrans()
+{
+    //TODO
 }
 
 /*
 select A N - vybere náhodný prvek z množiny nebo relace A a tiskne ho. V pøípadì, že je množina A prázdná, pøeskoèí vykonávání pøíkazu na øádek N vstupního souboru. N v takovém pøípadì musí oznaèovat existující øádek ve vstupním souboru.
 */
-void selectFromRelation(){
-//TODO
+void selectFromRelation()
+{
+    //TODO
 }
 
-void selectFromSet(){
-//TODO
+void selectFromSet()
+{
+    //TODO
+}
+//command functions 
+
+void execute_fun_un_set(Command *com, Data *data)
+{
+   const static struct
+    {
+        const char *name;
+        void (*func)(Set *set);
+    } function_map_un_set[] = {
+        {"empty", empty},
+        {"card", card},
+        {"complement", complement}
+
+    };
+
+     for ( int i = 0; i < (sizeof(function_map_un_set) / sizeof(function_map_un_set[0])); i++)
+    {
+        if (!strcmp(function_map_un_set[i].name,com->functionName) && function_map_un_set[i].func)
+        {
+             function_map_un_set[i].func(data->rows[com->rowIndexA].set);
+              
+        }
+    }
+}
+//Command functions
+
+void function_lookup(Command *com, Data *data)
+{
+
+    if (data->rows[com->rowIndexA].set != NULL)
+    {
+        if (data->rows[com->rowIndexB].set != NULL && data->rows[com->rowIndexB].relation == NULL)
+        {
+            //execute_fun_bin_set(com,data);
+        }
+        else
+        {
+            execute_fun_un_set(com, data);
+        }
+    }
+    
 }
 
 // Arguments
@@ -515,34 +650,37 @@ Rozšíøení všech pøíkazù, které tisknou true nebo false o další argume
 
 int main(int argc, char *argv[])
 {
-    if(argc != 2){
+    if (argc != 2)
+    {
         fprintf(stderr, "Invalidni pocet argumentu. \n");
         return 1;
     }
 
-    char* fileName = argv[1];
+    char *fileName = argv[1];
 
     //Test if project is running
-    Data* data = initData();
+    Data *data = initData();
 
-    FILE* file = fopen(fileName, "r");
+    FILE *file = fopen(fileName, "r");
     if (file == NULL)
     {
-        fprintf(stderr,"file did not open \n");
+        fprintf(stderr, "file did not open \n");
         return 1;
     }
-    
 
     loadFileData(file, data);
 
     printData(data);
 
-    for(int i = 0; i < data->size; i ++){
-        Row* row = &data->rows[i];
-        if(row->set != NULL && row->command){
-            Command* command = parseSetToCommand(row->set);
+    for (int i = 0; i < data->size; i++)
+    {
+        Row *row = &data->rows[i];
+        if (row->set != NULL && row->command)
+        {
+            Command *command = parseSetToCommand(row->set);
             activateCommand(command, data);
 
+            //command handeling
         }
     }
 

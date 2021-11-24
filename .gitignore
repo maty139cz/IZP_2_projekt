@@ -57,7 +57,9 @@ dkms.conf
 *.depend
 
 #added 
-.vscode/c_cpp_properties.json
+.vscode/*
 setcal
 test.c
 Makefile
+test.txt
+
