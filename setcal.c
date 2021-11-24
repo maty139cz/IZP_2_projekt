@@ -218,8 +218,8 @@ void activateCommand(Command* command, Data* data){
     if(command->rowIndexB != 0){
         row2 = &data->rows[command->rowIndexB];
     }
-
-    printf("Prikaz");
+    //control print 
+   /* printf("Prikaz");
     printCommand(command);
     printf("plati pro mnozinu: \n");
 
@@ -230,6 +230,7 @@ void activateCommand(Command* command, Data* data){
     if(row2 != NULL && row2->set != NULL && !row2->command){
         printf(" a zaroven \n");
         printSet(row2->set);
+        */
     }
 }
 
@@ -326,7 +327,7 @@ void printRelation(Relation *relation){
     for(int x = 0; x < relation->size; x++){
         Pair* pair = relation->pairs[x];
 
-        printf(" Hodnota A s%, hodnota B, cela relace je (%s %s) ",
+        printf(" Hodnota A %s, hodnota B %s, cela relace je (%s %s) ",
         pair->elementA->values,
         pair->elementB->values,
         pair->elementA->values,
@@ -512,7 +513,7 @@ Rozšíøení všech pøíkazù, jejichž výsledkem je množina nebo relace, de
 Rozšíøení všech pøíkazù, které tisknou true nebo false o další argument N. V pøípadì, že operace konèí s výsledkem false, následující øádek, který se zpracovává, bude na øádku N (nikoliv bezprostøednì následující).
 */
 
-int main(int argc, char **argv[])
+int main(int argc, char *argv[])
 {
     if(argc != 2){
         fprintf(stderr, "Invalidni pocet argumentu. \n");
@@ -525,6 +526,12 @@ int main(int argc, char **argv[])
     Data* data = initData();
 
     FILE* file = fopen(fileName, "r");
+    if (file == NULL)
+    {
+        fprintf(stderr,"file did not open \n");
+        return 1;
+    }
+    
 
     loadFileData(file, data);
 
