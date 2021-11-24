@@ -627,7 +627,8 @@ void execute_fun_un_set(Command *com, Data *data)
 
 void function_lookup(Command *com, Data *data)
 {
-
+    Set *set1 = data->rows[com->rowIndexA].set;
+    Set *set2 = data->rows[com->rowIndexB].set;
     if (data->rows[com->rowIndexA].set != NULL)
     {
         if (data->rows[com->rowIndexB].set != NULL && data->rows[com->rowIndexB].relation == NULL)
@@ -679,8 +680,9 @@ int main(int argc, char *argv[])
         {
             Command *command = parseSetToCommand(row->set);
             activateCommand(command, data);
-
-            //command handeling
+            function_lookup(command,data);
+            
+            
         }
     }
 
