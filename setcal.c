@@ -58,26 +58,6 @@ Element* initElement(){
     return element;
 }
 
-void addSetElement(Set* set, Element* element){
-
-    if(element->lenght < MAX_ELEMENT_LENGTH){
-        element->values[element->lenght + 1] = '\0';
-    }
-
-    if(set->size > 0 && set->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
-        set->elements = (Element**) realloc(set->elements, set->size + sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
-    }
-
-    set->elements[set->size] = element;
-    set->size++;
-
-    set->elements[set->size] = initElement();
-}
-
-Pair* addRelationPair(Relation* relation){
-    return NULL;
-}
-
 Set* initSet(){
     Set* set = malloc(sizeof(Set));
     set->elements = (Element**) malloc(sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
@@ -87,9 +67,23 @@ Set* initSet(){
 }
 
 Relation* initRelation(){
-    return NULL;
+    Relation* relation = malloc(sizeof(Relation));
+    relation->pairs = (Pair**) malloc(sizeof(Pair*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+    relation->size = 0;
+    relation->pairs[0] = NULL;
+    return relation;
 }
 
+Pair* initPair(Relation* relation){
+    Pair* pair = malloc(sizeof(Pair));
+
+    pair->elementA = NULL;
+    pair->elementB = NULL;
+
+    relation->pairs[relation->size] = pair;
+
+    return pair;
+}
 
 Data* initData(){
     Data* data = malloc(sizeof(Data));
@@ -141,6 +135,60 @@ void freeData(Data* data){
 
 // --Util functions--
 
+Command* parseSetToCommand(Set* set){
+    Command* command = malloc(sizeof(Command));
+    if(set->size > 0){
+        strcpy(&command->functionName, &set->elements[0]->values) ;
+
+        if(set->size > 1){
+            command->rowIndexA = atoi(&set->elements[1]->values);
+        }else{
+            command->rowIndexA = 0;
+        }
+
+        if(set->size > 2){
+            command->rowIndexB = atoi(&set->elements[2]->values);
+        }else{
+            command->rowIndexA = 0;
+        }
+    }
+
+    return command;
+}
+
+void addSetElement(Set* set, Element* element){
+    set->elements[set->size] = element;
+    set->size++;
+
+    if(set->size > 0 && set->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
+        set->elements = (Element**) realloc(set->elements, set->size + sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+    }
+
+    set->elements[set->size] = initElement();
+}
+
+void finishPair(Pair* pair){
+    finishElement(pair->elementA);
+    finishElement(pair->elementB);
+}
+
+void finishLastPair(Relation* relation){
+    finishPair(relation->pairs[relation->size]);
+    relation->size++;
+
+    if(relation->size > 0 && relation->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
+        relation->pairs = (Pair**) realloc(relation->pairs, relation->size + sizeof(Pair*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+    }
+
+    relation->pairs[relation->size] = NULL;
+}
+
+void finishElement(Element* element){
+    if(element->lenght < MAX_ELEMENT_LENGTH){
+        element->values[element->lenght + 1] = '\0';
+    }
+}
+
 //Returns if set has ended
 bool parseToSet(Set* set, char c){
     Element* element = set->elements[set->size];
@@ -163,47 +211,39 @@ bool parseToSet(Set* set, char c){
     return false;
 }
 
-Command* parseSetToCommand(Set* set){
-    Command* command = malloc(sizeof(Command));
-    if(set->size > 0){
-        strcpy(&command->functionName, &set->elements[0]->values) ;
+void parseToRelation(Relation* relation, char c){
+    Pair* pair = relation->pairs[relation->size];
+    Element* element = NULL;
 
-        if(set->size > 1){
-            command->rowIndexA = atoi(&set->elements[1]->values);
+    if(c == ' ' && pair == NULL){
+        printf("here3");
+        relation->pairs[relation->size] = initPair(relation);
+    }else if (pair != NULL){
+        if(c == '('){
+            printf("here1");
+            pair->elementA = initElement();
+        }else if(c == ')'){
+            printf("here2");
+            finishLastPair(relation);
+        }else if(c == ' ' && pair->elementB == NULL){
+            printf("here4");
+            pair->elementB = initElement();
         }else{
-            command->rowIndexA = 0;
-        }
-
-        if(set->size > 2){
-            command->rowIndexB = atoi(&set->elements[2]->values);
-        }else{
-            command->rowIndexA = 0;
+            if(pair->elementB != NULL){
+                printf("here5");
+                element = pair->elementB;
+            }else{
+                printf("here6");
+                element = pair->elementA;
+            }
         }
     }
 
-    return command;
-}
-
-bool parseToRelation(Relation* set, char c){
-                    /*}else if(relation != NULL){
-                if(c == '('){
-                    printf("here8");
-                    if(relation->size == 0){
-                        relation->pairs = (Pair*) malloc(sizeof(Pair) * DEFAULT_ELEMENT_ARRAY_LENGHT);
-                    }else if(relation->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
-                        relation->pairs = (Pair*) realloc(relation->pairs, relation->size + sizeof(Pair*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
-                    }
-
-                    relation->pairs[relation->size] = (Pair**) malloc(sizeof(Pair*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
-                    pair = &relation->pairs[relation->size];
-
-                    element = initElement();
-
-                    relation->size++;
-                } else if(c == ')'){
-                    pair->elementB = element;
-                }*/
-    return false;
+    if(element != NULL){
+        printf("here %d", element->lenght);
+        element->values[element->lenght] = c;
+        element->lenght++;
+    }
 }
 
 // --Data processing--
@@ -272,14 +312,11 @@ void loadFileData(FILE* file, Data* data){
 
         printf("%c \n", c);
 
-        if(relation != NULL){
-            first = parseToRelation(relation, c);
-        }else{
-            first = parseToSet(set, c);
-        }
-
-        if(first){
+        if(relation != NULL && c != '\n'){
+            parseToRelation(relation, c);
+        }else if (set != NULL && parseToSet(set, c) || c == '\n'){
             data->size++;
+            first = true;
         }
     }
 }
@@ -302,7 +339,7 @@ void printData(Data* data){
         Row row = data->rows[i];
 
         if(row.relation != NULL){
-            printf("Na radku %d je relation: ", i);
+            printf("Na radku %d je relation: \n", i);
             printRelation(row.relation);
         }else if(row.set != NULL){
             if(row.command)
@@ -326,7 +363,11 @@ void printRelation(Relation *relation){
     for(int x = 0; x < relation->size; x++){
         Pair* pair = relation->pairs[x];
 
-        printf(" Hodnota A s%, hodnota B, cela relace je (%s %s) ",
+        if(pair == NULL){
+            printf("here %d", x);
+        }
+
+        printf(" Hodnota A %s, hodnota B %s, cela relace je (%s %s) \n",
         pair->elementA->values,
         pair->elementB->values,
         pair->elementA->values,
@@ -535,7 +576,6 @@ int main(int argc, char **argv[])
         if(row->set != NULL && row->command){
             Command* command = parseSetToCommand(row->set);
             activateCommand(command, data);
-
         }
     }
 
