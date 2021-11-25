@@ -200,11 +200,11 @@ Command *parseSetToCommand(Set *set)
     Command *command = malloc(sizeof(Command));
     if (set->size > 0)
     {
-        strcpy(&command->functionName, &set->elements[0]->values);
+        strcpy(command->functionName, set->elements[0]->values);
 
         if (set->size > 1)
         {
-            command->rowIndexA = atoi(&set->elements[1]->values);
+            command->rowIndexA = atoi(set->elements[1]->values);
         }
         else
         {
@@ -213,7 +213,7 @@ Command *parseSetToCommand(Set *set)
 
         if (set->size > 2)
         {
-            command->rowIndexB = atoi(&set->elements[2]->values);
+            command->rowIndexB = atoi(set->elements[2]->values);
         }
         else
         {
@@ -263,7 +263,7 @@ void activateCommand(Command *command, Data *data)
         row2 = &data->rows[command->rowIndexB];
     }
     //control print
-    /* printf("Prikaz");
+     printf("Prikaz");
     printCommand(command);
     printf("plati pro mnozinu: \n");
 
@@ -275,7 +275,7 @@ void activateCommand(Command *command, Data *data)
         printf(" a zaroven \n");
         printSet(row2->set);
        
-    }*/
+    }
 }
 
 void loadFileData(FILE *file, Data *data)
@@ -627,19 +627,15 @@ void execute_fun_un_set(Command *com, Data *data)
 
 void function_lookup(Command *com, Data *data)
 {
-    Set *set1 = data->rows[com->rowIndexA].set;
-    Set *set2 = data->rows[com->rowIndexB].set;
-    if (data->rows[com->rowIndexA].set != NULL)
+    if (data->rows[com->rowIndexA].set!= 0)
     {
-        if (data->rows[com->rowIndexB].set != NULL && data->rows[com->rowIndexB].relation == NULL)
-        {
-            //execute_fun_bin_set(com,data);
-        }
-        else
-        {
-            execute_fun_un_set(com, data);
-        }
+        /* code */
     }
+    
+    
+        
+        
+    
     
 }
 
