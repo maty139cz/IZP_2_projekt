@@ -155,6 +155,9 @@ void freeData(Data *data)
 Command* parseSetToCommand(Set* set){
     Command* command = malloc(sizeof(Command));
 
+    command->rowIndexA = -1;
+    command->rowIndexB = -1;
+
     if(set->size > 0){
         strcpy(&command->functionName, &set->elements[0]->values) ;
 
@@ -163,11 +166,7 @@ Command* parseSetToCommand(Set* set){
 
             if(set->size > 2){
                 command->rowIndexB = atoi(&set->elements[2]->values);
-            }else{
-                command->rowIndexB = 0;
             }
-        }else{
-            command->rowIndexA = 0;
         }
     }
 
