@@ -152,20 +152,20 @@ void freeData(Data *data)
 }
 
 // --Util functions--
-
 Command* parseSetToCommand(Set* set){
     Command* command = malloc(sizeof(Command));
+
     if(set->size > 0){
         strcpy(&command->functionName, &set->elements[0]->values) ;
 
         if(set->size > 1){
             command->rowIndexA = atoi(&set->elements[1]->values);
-        }else{
-            command->rowIndexA = 0;
-        }
 
-        if(set->size > 2){
-            command->rowIndexB = atoi(&set->elements[2]->values);
+            if(set->size > 2){
+                command->rowIndexB = atoi(&set->elements[2]->values);
+            }else{
+                command->rowIndexB = 0;
+            }
         }else{
             command->rowIndexA = 0;
         }
@@ -212,14 +212,14 @@ bool parseToSet(Set *set, char c)
 {
     Element *element = set->elements[set->size];
 
-    if (c == ' ' || c == '\n')
+    if (c == ' ' || c == '\n' || c == EOF)
     {
         if (element != NULL)
         {
             addSetElement(set, element);
         }
 
-        if (c == '\n')
+        if (c == '\n' || c == EOF)
         {
             return true;
         }
@@ -298,7 +298,6 @@ void activateCommand(Command *command, Data *data)
 
 void loadFileData(FILE *file, Data *data)
 {
-    char c;
     Relation *relation = NULL;
     Command *command = NULL;
     Set *set = NULL;
@@ -307,8 +306,11 @@ void loadFileData(FILE *file, Data *data)
 
     bool first = true;
 
-    while ((c = getc(file)) != EOF && data->size <= MAX_ROWS)
+    char c;
+
+    do
     {
+        c = getc(file);
 
         if (first)
         {
@@ -340,15 +342,15 @@ void loadFileData(FILE *file, Data *data)
             continue;
         }
 
-        // printf("%c \n", c);
+         printf("%c \n", c);
 
         if(relation != NULL && c != '\n'){
             parseToRelation(relation, c);
-        }else if (set != NULL && parseToSet(set, c) || c == '\n'){
+        }else if (set != NULL && parseToSet(set, c) || c == '\n' || c == EOF){
             data->size++;
             first = true;
         }
-    }
+    }while (c != EOF && data->size <= MAX_ROWS);
 }
 
 // --Print functions--
@@ -382,13 +384,13 @@ void printData(Data *data)
             if (row.command)
             {
                 Command *command = parseSetToCommand(row.set);
-                //printf("Na radku je %d je prikaz: ", i);
-                //printCommand(command);
+                printf("Na radku je %d je prikaz: ", i);
+                printCommand(command);
             }
             else
             {
-                //printf("Na radku je %d je mnozina: ", i);
-                //printSet(row.set);
+                printf("Na radku je %d je mnozina: ", i);
+                printSet(row.set);
             }
         }
     }
@@ -666,6 +668,7 @@ int main(int argc, char *argv[])
     Data *data = initData();
 
     FILE *file = fopen(fileName, "r");
+
     if (file == NULL)
     {
         fprintf(stderr, "file did not open \n");
