@@ -55,3 +55,11 @@ dkms.conf
 *.cbp
 *.layout
 *.depend
+
+#added 
+.vscode/*
+setcal
+test.c
+Makefile
+test.txt
+
