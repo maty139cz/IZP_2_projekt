@@ -66,24 +66,27 @@ Element *initElement()
     return element;
 }
 
-Set* initSet(){
-    Set* set = malloc(sizeof(Set));
-    set->elements = (Element**) malloc(sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+Set *initSet()
+{
+    Set *set = malloc(sizeof(Set));
+    set->elements = (Element **)malloc(sizeof(Element *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
     set->size = 0;
     set->elements[0] = NULL;
     return set;
 }
 
-Relation* initRelation(){
-    Relation* relation = malloc(sizeof(Relation));
-    relation->pairs = (Pair**) malloc(sizeof(Pair*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+Relation *initRelation()
+{
+    Relation *relation = malloc(sizeof(Relation));
+    relation->pairs = (Pair **)malloc(sizeof(Pair *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
     relation->size = 0;
     relation->pairs[0] = NULL;
     return relation;
 }
 
-Pair* initPair(Relation* relation){
-    Pair* pair = malloc(sizeof(Pair));
+Pair *initPair(Relation *relation)
+{
+    Pair *pair = malloc(sizeof(Pair));
 
     pair->elementA = NULL;
     pair->elementB = NULL;
@@ -93,8 +96,9 @@ Pair* initPair(Relation* relation){
     return pair;
 }
 
-Data* initData(){
-    Data* data = malloc(sizeof(Data));
+Data *initData()
+{
+    Data *data = malloc(sizeof(Data));
     data->size = 0;
     return data;
 }
@@ -152,19 +156,23 @@ void freeData(Data *data)
 }
 
 // --Util functions--
-Command* parseSetToCommand(Set* set){
-    Command* command = malloc(sizeof(Command));
+Command *parseSetToCommand(Set *set)
+{
+    Command *command = malloc(sizeof(Command));
 
     command->rowIndexA = -1;
     command->rowIndexB = -1;
 
-    if(set->size > 0){
-        strcpy(&command->functionName, &set->elements[0]->values) ;
+    if (set->size > 0)
+    {
+        strcpy(&command->functionName, &set->elements[0]->values);
 
-        if(set->size > 1){
+        if (set->size > 1)
+        {
             command->rowIndexA = atoi(&set->elements[1]->values);
 
-            if(set->size > 2){
+            if (set->size > 2)
+            {
                 command->rowIndexB = atoi(&set->elements[2]->values);
             }
         }
@@ -173,35 +181,42 @@ Command* parseSetToCommand(Set* set){
     return command;
 }
 
-void addSetElement(Set* set, Element* element){
+void addSetElement(Set *set, Element *element)
+{
     set->elements[set->size] = element;
     set->size++;
 
-    if(set->size > 0 && set->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
-        set->elements = (Element**) realloc(set->elements, set->size + sizeof(Element*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+    if (set->size > 0 && set->size % DEFAULT_ELEMENT_ARRAY_LENGHT)
+    {
+        set->elements = (Element **)realloc(set->elements, set->size + sizeof(Element *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
     }
 
     set->elements[set->size] = initElement();
 }
 
-void finishPair(Pair* pair){
+void finishPair(Pair *pair)
+{
     finishElement(pair->elementA);
     finishElement(pair->elementB);
 }
 
-void finishLastPair(Relation* relation){
+void finishLastPair(Relation *relation)
+{
     finishPair(relation->pairs[relation->size]);
     relation->size++;
 
-    if(relation->size > 0 && relation->size % DEFAULT_ELEMENT_ARRAY_LENGHT){
-        relation->pairs = (Pair**) realloc(relation->pairs, relation->size + sizeof(Pair*) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+    if (relation->size > 0 && relation->size % DEFAULT_ELEMENT_ARRAY_LENGHT)
+    {
+        relation->pairs = (Pair **)realloc(relation->pairs, relation->size + sizeof(Pair *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
     }
 
     relation->pairs[relation->size] = NULL;
 }
 
-void finishElement(Element* element){
-    if(element->lenght < MAX_ELEMENT_LENGTH){
+void finishElement(Element *element)
+{
+    if (element->lenght < MAX_ELEMENT_LENGTH)
+    {
         element->values[element->lenght + 1] = '\0';
     }
 }
@@ -236,29 +251,44 @@ bool parseToSet(Set *set, char c)
     return false;
 }
 
-void parseToRelation(Relation* relation, char c){
-    Pair* pair = relation->pairs[relation->size];
-    Element* element = NULL;
+void parseToRelation(Relation *relation, char c)
+{
+    Pair *pair = relation->pairs[relation->size];
+    Element *element = NULL;
 
-    if(c == ' ' && pair == NULL){
+    if (c == ' ' && pair == NULL)
+    {
         relation->pairs[relation->size] = initPair(relation);
-    }else if (pair != NULL){
-        if(c == '('){
+    }
+    else if (pair != NULL)
+    {
+        if (c == '(')
+        {
             pair->elementA = initElement();
-        }else if(c == ')'){
+        }
+        else if (c == ')')
+        {
             finishLastPair(relation);
-        }else if(c == ' ' && pair->elementB == NULL){
+        }
+        else if (c == ' ' && pair->elementB == NULL)
+        {
             pair->elementB = initElement();
-        }else{
-            if(pair->elementB != NULL){
+        }
+        else
+        {
+            if (pair->elementB != NULL)
+            {
                 element = pair->elementB;
-            }else{
+            }
+            else
+            {
                 element = pair->elementA;
             }
         }
     }
 
-    if(element != NULL){
+    if (element != NULL)
+    {
         element->values[element->lenght] = c;
         element->lenght++;
     }
@@ -280,18 +310,19 @@ void activateCommand(Command *command, Data *data)
         row2 = &data->rows[command->rowIndexB];
     }
     //control print
-     printf("Prikaz");
+    printf("Prikaz");
     printCommand(command);
     printf("plati pro mnozinu: \n");
 
-    if(row1 != NULL && row1->set != NULL && !row1->command){
+    if (row1 != NULL && row1->set != NULL && !row1->command)
+    {
         printSet(row1->set);
     }
 
-    if(row2 != NULL && row2->set != NULL && !row2->command){
+    if (row2 != NULL && row2->set != NULL && !row2->command)
+    {
         printf(" a zaroven \n");
         printSet(row2->set);
-
     }
 }
 
@@ -341,15 +372,18 @@ void loadFileData(FILE *file, Data *data)
             continue;
         }
 
-         printf("%c \n", c);
+        printf("%c \n", c);
 
-        if(relation != NULL && c != '\n'){
+        if (relation != NULL && c != '\n')
+        {
             parseToRelation(relation, c);
-        }else if (set != NULL && parseToSet(set, c) || c == '\n' || c == EOF){
+        }
+        else if (set != NULL && parseToSet(set, c) || c == '\n' || c == EOF)
+        {
             data->size++;
             first = true;
         }
-    }while (c != EOF && data->size <= MAX_ROWS);
+    } while (c != EOF && data->size <= MAX_ROWS);
 }
 
 // --Print functions--
@@ -374,7 +408,8 @@ void printData(Data *data)
     {
         Row row = data->rows[i];
 
-        if(row.relation != NULL){
+        if (row.relation != NULL)
+        {
             printf("Na radku %d je relation: \n", i);
             printRelation(row.relation);
         }
@@ -406,14 +441,14 @@ void printRelation(Relation *relation)
         Pair *pair = relation->pairs[x];
 
         printf(" Hodnota A %s, hodnota B %s, cela relace je (%s %s) \n",
-        pair->elementA->values,
-        pair->elementB->values,
-        pair->elementA->values,
-        pair->elementB->values);
+               pair->elementA->values,
+               pair->elementB->values,
+               pair->elementA->values,
+               pair->elementB->values);
     }
     printf("\n");
 }
-//Command lookup tables
+
 
 // --Set functions--
 
@@ -489,6 +524,7 @@ equals A B - tiskne true nebo false, jestli jsou množiny rovny.
 void equals()
 {
     //TODO
+    printf("eq");
 }
 
 // --Relation functions--
@@ -612,7 +648,6 @@ void selectFromSet()
     //TODO
 }
 
-
 // Arguments
 /*
 Rozšíøení všech pøíkazù, jejichž výsledkem je množina nebo relace, definuje novou množinu nebo relaci identifikovanou èíslem øádku, na kterém se nachází daná operace.
@@ -621,35 +656,112 @@ Rozšíøení všech pøíkazù, které tisknou true nebo false o další argume
 //-- Bonus --
 
 //command functions
-void execute_fun_un_set(Command *com, Data *data)
+void executeFunUnSet(Command *com, Data *data)
 {
-   const static struct
+    const static struct
     {
         const char *name;
         void (*func)(Set *set);
     } function_map_un_set[] = {
         {"empty", empty},
         {"card", card},
-        {"complement", complement}
+        {"complement", complement},
+        //Bonus
+        {"selectFromSet",selectFromSet}
 
     };
 
-     for ( int i = 0; i < (sizeof(function_map_un_set) / sizeof(function_map_un_set[0])); i++)
+    for (int i = 0; i < (sizeof(function_map_un_set) / sizeof(function_map_un_set[0])); i++)
     {
-        if (!strcmp(function_map_un_set[i].name,com->functionName) && function_map_un_set[i].func)
+        if (!strcmp(function_map_un_set[i].name, com->functionName) && function_map_un_set[i].func)
         {
-             function_map_un_set[i].func(data->rows[com->rowIndexA].set);
+            function_map_un_set[i].func(data->rows[com->rowIndexA].set);
+        }
+    }
+}
 
+void executeFunBinSet(Command *com, Data *data)
+{
+    const static struct
+    {
+        const char *name;
+        void (*func)(Set *set1, Set *set2);
+    } function_map_un_set[] = {
+        {"setUnion", setUnion},
+        {"intersect", intersect},
+        {"minus", minus},
+        {"subseteq", subseteq},
+        {"subset", subset},
+        {"equals", equals}
+
+    };
+
+    for (int i = 0; i < (sizeof(function_map_un_set) / sizeof(function_map_un_set[0])); i++)
+    {
+        if (!strcmp(function_map_un_set[i].name, com->functionName) && function_map_un_set[i].func)
+        {
+            function_map_un_set[i].func(data->rows[com->rowIndexA].set, data->rows[com->rowIndexB].set);
+        }
+    }
+}
+void executeFunRel(Command *com, Data *data)
+{
+
+    const static struct
+    {
+        const char *name;
+        void (*func)(Relation *relation);
+    } function_map_un_set[] = {
+        {"reflexive",reflexive},
+        {"symmetric",symmetric}, 
+        {"antisymmetric",antisymmetric},
+        {"transitive",transitive}, 
+        {"function",function},
+        {"domain",domain}, 
+        {"codomain",codomain},
+        {"injective",injective}, 
+        {"surjective",surjective}, 
+        {"bijective",bijective},
+        //Advanced 
+        {"closureRef",closureRef}, 
+        {"closureSym",closureSym},
+        {"closureTrans",closureTrans},
+        //Bonus 
+        {"selectFromRelation",selectFromRelation}
+
+
+
+    };
+
+    for (int i = 0; i < (sizeof(function_map_un_set) / sizeof(function_map_un_set[0])); i++)
+    {
+        if (!strcmp(function_map_un_set[i].name, com->functionName) && function_map_un_set[i].func)
+        {
+            function_map_un_set[i].func(data->rows[com->rowIndexA].relation);
         }
     }
 }
 
 //Command functions
-void function_lookup(Command *com, Data *data)
+void functionLookup(Command *com, Data *data)
 {
-    if (data->rows[com->rowIndexA].set!= 0)
+    if (com->rowIndexA >= 0 && data->rows[com->rowIndexA].set != NULL)
     {
-        /* code */
+        if (com->rowIndexB >= 0 && data->rows[com->rowIndexB].set != NULL)
+        {
+            executeFunBinSet(com, data);
+        }
+        else
+        {
+            executeFunUnSet(com, data);
+        }
+    }
+    else
+    {
+        if (com->rowIndexA >= 0 && data->rows[com->rowIndexA].relation != NULL)
+        {
+            executeFunRel(com, data);
+        }
     }
 }
 
@@ -685,7 +797,7 @@ int main(int argc, char *argv[])
         {
             Command *command = parseSetToCommand(row->set);
             activateCommand(command, data);
-            function_lookup(command,data);
+            functionLookup(command, data);
         }
     }
 
