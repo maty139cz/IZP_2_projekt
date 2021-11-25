@@ -216,31 +216,24 @@ void parseToRelation(Relation* relation, char c){
     Element* element = NULL;
 
     if(c == ' ' && pair == NULL){
-        printf("here3");
         relation->pairs[relation->size] = initPair(relation);
     }else if (pair != NULL){
         if(c == '('){
-            printf("here1");
             pair->elementA = initElement();
         }else if(c == ')'){
-            printf("here2");
             finishLastPair(relation);
         }else if(c == ' ' && pair->elementB == NULL){
-            printf("here4");
             pair->elementB = initElement();
         }else{
             if(pair->elementB != NULL){
-                printf("here5");
                 element = pair->elementB;
             }else{
-                printf("here6");
                 element = pair->elementA;
             }
         }
     }
 
     if(element != NULL){
-        printf("here %d", element->lenght);
         element->values[element->lenght] = c;
         element->lenght++;
     }
