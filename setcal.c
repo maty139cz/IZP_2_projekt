@@ -449,14 +449,13 @@ void printRelation(Relation *relation)
     printf("\n");
 }
 
-
 // --Set functions--
 
 /*
 empty A - tiskne true nebo false podle toho, jestli je množina definovaná na øádku A prázdná nebo neprázdná.
 */
 
-void empty(Set *set)
+void empty(Set *set, Set *universe)
 {
     //TODO
     printf("empty");
@@ -465,7 +464,7 @@ void empty(Set *set)
 /*
 card A - tiskne poèet prvkù v množinì A (definované na øádku A).
 */
-void card()
+void card(Set *set, Set *universe)
 {
     //TODO
 }
@@ -473,7 +472,7 @@ void card()
 /*
 complement A - tiskne doplnìk množiny A.
 */
-void complement()
+void complement(Set *set, Set *universe)
 {
     //TODO
 }
@@ -481,7 +480,7 @@ void complement()
 /*
 union A B - tiskne sjednocení množin A a B.
 */
-void setUnion()
+void setUnion(Set *set1, Set *set2, Set *universe)
 {
     //TODO
 }
@@ -489,7 +488,7 @@ void setUnion()
 /*
 intersect A B - tiskne prùnik množin A a B.
 */
-void intersect()
+void intersect(Set *set1, Set *set2, Set *universe)
 {
     //TODO
 }
@@ -497,7 +496,7 @@ void intersect()
 /*
 minus A B - tiskne rozdíl množin A \ B.
 */
-void minus()
+void minus(Set *set1, Set *set2, Set *universe)
 {
     //TODO
 }
@@ -505,7 +504,7 @@ void minus()
 /*
 subseteq A B - tiskne true nebo false podle toho, jestli je množina A podmnožinou množiny B.
 */
-void subseteq()
+void subseteq(Set *set1, Set *set2, Set *universe)
 {
     //TODO
 }
@@ -513,7 +512,7 @@ void subseteq()
 /*
 subset A B - tiskne true nebo false, jestli je množina A vlastní podmnožina množiny B.
 */
-void subset()
+void subset(Set *set1, Set *set2, Set *universe)
 {
     //TODO
 }
@@ -521,7 +520,7 @@ void subset()
 /*
 equals A B - tiskne true nebo false, jestli jsou množiny rovny.
 */
-void equals()
+void equals(Set *set1, Set *set2, Set *universe)
 {
     //TODO
     printf("eq");
@@ -531,15 +530,14 @@ void equals()
 /*
 reflexive R - tiskne true nebo false, jestli je relace reflexivní.
 */
-void reflexive()
+void reflexive(Relation *rel, Set *universe)
 {
-    //TODO
 }
 
 /*
 symmetric R - tiskne true nebo false, jestli je relace symetrická.
 */
-void symmetric()
+void symmetric(Relation *rel, Set *universe)
 {
     //TODO
 }
@@ -547,7 +545,7 @@ void symmetric()
 /*
 antisymmetric R - tiskne true nebo false, jestli je relace antisymetrická.
 */
-void antisymmetric()
+void antisymmetric(Relation *rel, Set *universe)
 {
     //TODO
 }
@@ -555,7 +553,7 @@ void antisymmetric()
 /*
 transitive R - tiskne true nebo false, jestli je relace tranzitivní.
 */
-void transitive()
+void transitive(Relation *rel, Set *universe)
 {
     //TODO
 }
@@ -563,7 +561,7 @@ void transitive()
 /*
 function R - tiskne true nebo false, jestli je relace R funkcí.
 */
-void function()
+void function(Relation *rel, Set *universe)
 {
     //TODO
 }
@@ -571,7 +569,7 @@ void function()
 /*
 domain R - tiskne definièní obor funkce R (lze aplikovat i na relace - první prvky dvojic).
 */
-void domain()
+void domain(Relation *rel, Set *universe)
 {
     //TODO
 }
@@ -579,7 +577,7 @@ void domain()
 /*
 codomain R - tiskne obor hodnot funkce R (lze aplikovat i na relace - druhé prvky dvojic).
 */
-void codomain()
+void codomain(Relation *rel, Set *universe)
 {
     //TODO
 }
@@ -587,7 +585,7 @@ void codomain()
 /*
 injective R - tiskne true nebo false, jestli je funkce R injektivní.
 */
-void injective()
+void injective(Relation *rel, Set *set1, Set *set2, Set *universe)
 {
     //TODO
 }
@@ -595,7 +593,7 @@ void injective()
 /*
 surjective R - tiskne true nebo false, jestli je funkce R surjektivní.
 */
-void surjective()
+void surjective(Relation *rel, Set *set1, Set *set2, Set *universe)
 {
     //TODO
 }
@@ -603,7 +601,7 @@ void surjective()
 /*
 bijective R - tiskne true nebo false, jestli je funkce R bijektivní.
 */
-void bijective()
+void bijective(Relation *rel, Set *set1, Set *set2, Set *universe)
 {
     //TODO
 }
@@ -613,7 +611,7 @@ void bijective()
 /*
 closure_ref R - tiskne reflexivní uzávìr relace R
 */
-void closureRef()
+void closureRef(Relation *rel, Set *universe)
 {
     //TODO
 }
@@ -621,7 +619,7 @@ void closureRef()
 /*
 closure_sym R - tiskne symetrický uzávìr relace R
 */
-void closureSym()
+void closureSym(Relation *rel, Set *universe)
 {
     //TODO
 }
@@ -629,7 +627,7 @@ void closureSym()
 /*
 closure_trans R - tiskne tranzitivní uzávìr relace R
 */
-void closureTrans()
+void closureTrans(Relation *rel, Set *universe)
 {
     //TODO
 }
@@ -638,12 +636,12 @@ void closureTrans()
 /*
 select A N - vybere náhodný prvek z množiny nebo relace A a tiskne ho. V pøípadì, že je množina A prázdná, pøeskoèí vykonávání pøíkazu na øádek N vstupního souboru. N v takovém pøípadì musí oznaèovat existující øádek ve vstupním souboru.
 */
-void selectFromRelation()
+void selectFromRelation(Relation *rel, Set *universe)
 {
     //TODO
 }
 
-void selectFromSet()
+void selectFromSet(Set *set, Set *universe)
 {
     //TODO
 }
@@ -661,21 +659,21 @@ void executeFunUnSet(Command *com, Data *data)
     const static struct
     {
         const char *name;
-        void (*func)(Set *set);
-    } function_map_un_set[] = {
+        void (*func)(Set *set, Set *universe);
+    } functionMap[] = {
         {"empty", empty},
         {"card", card},
         {"complement", complement},
         //Bonus
-        {"selectFromSet",selectFromSet}
+        {"selectFromSet", selectFromSet}
 
     };
 
-    for (int i = 0; i < (sizeof(function_map_un_set) / sizeof(function_map_un_set[0])); i++)
+    for (int i = 0; i < (sizeof(functionMap) / sizeof(functionMap[0])); i++)
     {
-        if (!strcmp(function_map_un_set[i].name, com->functionName) && function_map_un_set[i].func)
+        if (!strcmp(functionMap[i].name, com->functionName) && functionMap[i].func)
         {
-            function_map_un_set[i].func(data->rows[com->rowIndexA].set);
+            functionMap[i].func(data->rows[com->rowIndexA].set, data->rows[0].set);
         }
     }
 }
@@ -685,8 +683,8 @@ void executeFunBinSet(Command *com, Data *data)
     const static struct
     {
         const char *name;
-        void (*func)(Set *set1, Set *set2);
-    } function_map_un_set[] = {
+        void (*func)(Set *set1, Set *set2, Set *universe);
+    } functionMap[] = {
         {"setUnion", setUnion},
         {"intersect", intersect},
         {"minus", minus},
@@ -696,48 +694,63 @@ void executeFunBinSet(Command *com, Data *data)
 
     };
 
-    for (int i = 0; i < (sizeof(function_map_un_set) / sizeof(function_map_un_set[0])); i++)
+    for (int i = 0; i < (sizeof(functionMap) / sizeof(functionMap[0])); i++)
     {
-        if (!strcmp(function_map_un_set[i].name, com->functionName) && function_map_un_set[i].func)
+        if (!strcmp(functionMap[i].name, com->functionName) && functionMap[i].func)
         {
-            function_map_un_set[i].func(data->rows[com->rowIndexA].set, data->rows[com->rowIndexB].set);
+            functionMap[i].func(data->rows[com->rowIndexA].set, data->rows[com->rowIndexB].set, data->rows[0].set);
         }
     }
 }
-void executeFunRel(Command *com, Data *data)
+void executeFunUnRel(Command *com, Data *data)
 {
 
     const static struct
     {
         const char *name;
-        void (*func)(Relation *relation);
-    } function_map_un_set[] = {
-        {"reflexive",reflexive},
-        {"symmetric",symmetric}, 
-        {"antisymmetric",antisymmetric},
-        {"transitive",transitive}, 
-        {"function",function},
-        {"domain",domain}, 
-        {"codomain",codomain},
-        {"injective",injective}, 
-        {"surjective",surjective}, 
-        {"bijective",bijective},
-        //Advanced 
-        {"closureRef",closureRef}, 
-        {"closureSym",closureSym},
-        {"closureTrans",closureTrans},
-        //Bonus 
-        {"selectFromRelation",selectFromRelation}
+        void (*func)(Relation *relation, Set *universe);
+    } functionMap[] = {
+        {"reflexive", reflexive},
+        {"symmetric", symmetric},
+        {"antisymmetric", antisymmetric},
+        {"transitive", transitive},
+        {"function", function},
+        {"domain", domain},
+        {"codomain", codomain},
+        //Advanced
+        {"closureRef", closureRef},
+        {"closureSym", closureSym},
+        {"closureTrans", closureTrans},
+        //Bonus
+        {"selectFromRelation", selectFromRelation}};
 
+    for (int i = 0; i < (sizeof(functionMap) / sizeof(functionMap[0])); i++)
+    {
+        if (!strcmp(functionMap[i].name, com->functionName) && functionMap[i].func)
+        {
+            functionMap[i].func(data->rows[com->rowIndexA].relation, data->rows[0].set);
+        }
+    }
+}
 
+void executeFunTriRel(Command *com, Data *data)
+{
+    const static struct
+    {
+        const char *name;
+        void (*func)(Relation *rel, Set *set1, Set *set2, Set *universe);
+    } functionMap[] = {
+        {"injective", injective},
+        {"surjective", surjective},
+        {"bijective", bijective},
 
     };
 
-    for (int i = 0; i < (sizeof(function_map_un_set) / sizeof(function_map_un_set[0])); i++)
+    for (int i = 0; i < (sizeof(functionMap) / sizeof(functionMap[0])); i++)
     {
-        if (!strcmp(function_map_un_set[i].name, com->functionName) && function_map_un_set[i].func)
+        if (!strcmp(functionMap[i].name, com->functionName) && functionMap[i].func)
         {
-            function_map_un_set[i].func(data->rows[com->rowIndexA].relation);
+            //  functionMap[i].func(data->rows[com->rowIndexA].relation,data->rows[com->rowIndexB].set,data->rows[com->rowIndexC].set,data->rows[0].set);
         }
     }
 }
@@ -760,7 +773,13 @@ void functionLookup(Command *com, Data *data)
     {
         if (com->rowIndexA >= 0 && data->rows[com->rowIndexA].relation != NULL)
         {
-            executeFunRel(com, data);
+            // if (com->rowIndexB>=0 && com->rowIndexC>=0 && data->rows[com->rowIndexB].set!=NULL && data->rows[com->rowIndexC].set!=NULL )
+            // {
+            executeFunTriRel(com, data);
+            // }else
+            // {
+            executeFunUnRel(com, data);
+            // }
         }
     }
 }
