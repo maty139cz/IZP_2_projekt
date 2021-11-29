@@ -449,14 +449,13 @@ void printRelation(Relation *relation)
     printf("\n");
 }
 
-
 // --Set functions--
 
 /*
 empty A - tiskne true nebo false podle toho, jestli je množina definovaná na øádku A prázdná nebo neprázdná.
 */
 
-void empty(Set *set,Set *universe)
+void empty(Set *set, Set *universe)
 {
     //TODO
     printf("empty");
@@ -465,7 +464,7 @@ void empty(Set *set,Set *universe)
 /*
 card A - tiskne poèet prvkù v množinì A (definované na øádku A).
 */
-void card(Set *set,Set *universe)
+void card(Set *set, Set *universe)
 {
     //TODO
 }
@@ -473,7 +472,7 @@ void card(Set *set,Set *universe)
 /*
 complement A - tiskne doplnìk množiny A.
 */
-void complement(Set *set,Set *universe)
+void complement(Set *set, Set *universe)
 {
     //TODO
 }
@@ -533,7 +532,6 @@ reflexive R - tiskne true nebo false, jestli je relace reflexivní.
 */
 void reflexive(Relation *rel, Set *universe)
 {
-   
 }
 
 /*
@@ -587,7 +585,7 @@ void codomain(Relation *rel, Set *universe)
 /*
 injective R - tiskne true nebo false, jestli je funkce R injektivní.
 */
-void injective(Relation *rel, Set *set1, Set *set2,Set *universe)
+void injective(Relation *rel, Set *set1, Set *set2, Set *universe)
 {
     //TODO
 }
@@ -595,7 +593,7 @@ void injective(Relation *rel, Set *set1, Set *set2,Set *universe)
 /*
 surjective R - tiskne true nebo false, jestli je funkce R surjektivní.
 */
-void surjective(Relation *rel, Set *set1, Set *set2,Set *universe)
+void surjective(Relation *rel, Set *set1, Set *set2, Set *universe)
 {
     //TODO
 }
@@ -603,7 +601,7 @@ void surjective(Relation *rel, Set *set1, Set *set2,Set *universe)
 /*
 bijective R - tiskne true nebo false, jestli je funkce R bijektivní.
 */
-void bijective(Relation *rel, Set *set1, Set *set2,Set *universe)
+void bijective(Relation *rel, Set *set1, Set *set2, Set *universe)
 {
     //TODO
 }
@@ -643,7 +641,7 @@ void selectFromRelation(Relation *rel, Set *universe)
     //TODO
 }
 
-void selectFromSet(Set *set,Set *universe)
+void selectFromSet(Set *set, Set *universe)
 {
     //TODO
 }
@@ -661,13 +659,13 @@ void executeFunUnSet(Command *com, Data *data)
     const static struct
     {
         const char *name;
-        void (*func)(Set *set,Set *universe);
+        void (*func)(Set *set, Set *universe);
     } functionMap[] = {
         {"empty", empty},
         {"card", card},
         {"complement", complement},
         //Bonus
-        {"selectFromSet",selectFromSet}
+        {"selectFromSet", selectFromSet}
 
     };
 
@@ -675,7 +673,7 @@ void executeFunUnSet(Command *com, Data *data)
     {
         if (!strcmp(functionMap[i].name, com->functionName) && functionMap[i].func)
         {
-            functionMap[i].func(data->rows[com->rowIndexA].set,data->rows[0].set);
+            functionMap[i].func(data->rows[com->rowIndexA].set, data->rows[0].set);
         }
     }
 }
@@ -700,7 +698,7 @@ void executeFunBinSet(Command *com, Data *data)
     {
         if (!strcmp(functionMap[i].name, com->functionName) && functionMap[i].func)
         {
-            functionMap[i].func(data->rows[com->rowIndexA].set, data->rows[com->rowIndexB].set,data->rows[0].set);
+            functionMap[i].func(data->rows[com->rowIndexA].set, data->rows[com->rowIndexB].set, data->rows[0].set);
         }
     }
 }
@@ -710,28 +708,27 @@ void executeFunUnRel(Command *com, Data *data)
     const static struct
     {
         const char *name;
-        void (*func)(Relation *relation,Set*universe);
+        void (*func)(Relation *relation, Set *universe);
     } functionMap[] = {
-        {"reflexive",reflexive},
-        {"symmetric",symmetric}, 
-        {"antisymmetric",antisymmetric},
-        {"transitive",transitive}, 
-        {"function",function},
-        {"domain",domain}, 
-        {"codomain",codomain},
-        //Advanced 
-        {"closureRef",closureRef}, 
-        {"closureSym",closureSym},
-        {"closureTrans",closureTrans},
-        //Bonus 
-        {"selectFromRelation",selectFromRelation}
-    };
+        {"reflexive", reflexive},
+        {"symmetric", symmetric},
+        {"antisymmetric", antisymmetric},
+        {"transitive", transitive},
+        {"function", function},
+        {"domain", domain},
+        {"codomain", codomain},
+        //Advanced
+        {"closureRef", closureRef},
+        {"closureSym", closureSym},
+        {"closureTrans", closureTrans},
+        //Bonus
+        {"selectFromRelation", selectFromRelation}};
 
     for (int i = 0; i < (sizeof(functionMap) / sizeof(functionMap[0])); i++)
     {
         if (!strcmp(functionMap[i].name, com->functionName) && functionMap[i].func)
         {
-            functionMap[i].func(data->rows[com->rowIndexA].relation,data->rows[0].set);
+            functionMap[i].func(data->rows[com->rowIndexA].relation, data->rows[0].set);
         }
     }
 }
@@ -741,13 +738,11 @@ void executeFunTriRel(Command *com, Data *data)
     const static struct
     {
         const char *name;
-        void (*func)(Relation *rel, Set *set1, Set *set2,Set *universe);
+        void (*func)(Relation *rel, Set *set1, Set *set2, Set *universe);
     } functionMap[] = {
-        {"empty", empty},
-        {"card", card},
-        {"complement", complement},
-        //Bonus
-        {"selectFromSet",selectFromSet}
+        {"injective", injective},
+        {"surjective", surjective},
+        {"bijective", bijective},
 
     };
 
@@ -755,7 +750,7 @@ void executeFunTriRel(Command *com, Data *data)
     {
         if (!strcmp(functionMap[i].name, com->functionName) && functionMap[i].func)
         {
-          //  functionMap[i].func(data->rows[com->rowIndexA].relation,data->rows[com->rowIndexB].set,data->rows[com->rowIndexC].set,data->rows[0].set);
+            //  functionMap[i].func(data->rows[com->rowIndexA].relation,data->rows[com->rowIndexB].set,data->rows[com->rowIndexC].set,data->rows[0].set);
         }
     }
 }
@@ -778,16 +773,13 @@ void functionLookup(Command *com, Data *data)
     {
         if (com->rowIndexA >= 0 && data->rows[com->rowIndexA].relation != NULL)
         {
-           // if (com->rowIndexB>=0 && com->rowIndexC>=0 && data->rows[com->rowIndexB].set!=NULL && data->rows[com->rowIndexC].set!=NULL )
-           // {
-                executeFunTriRel(com,data);
-           // }else
-           // {
-               executeFunUnRel(com, data);
-           // }
-            
-            
-            
+            // if (com->rowIndexB>=0 && com->rowIndexC>=0 && data->rows[com->rowIndexB].set!=NULL && data->rows[com->rowIndexC].set!=NULL )
+            // {
+            executeFunTriRel(com, data);
+            // }else
+            // {
+            executeFunUnRel(com, data);
+            // }
         }
     }
 }
