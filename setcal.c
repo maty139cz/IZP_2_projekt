@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdbool.h>
 
+//Default constants
 #define MAX_ROWS 1000
 #define MAX_ELEMENT_LENGTH 30
 #define DEFAULT_ELEMENT_ARRAY_LENGHT 10
@@ -16,38 +17,45 @@
 #define LARGEST_NUMBER_CHAR '9'
 #define SMALLEST_NUMBER_CHAR '0'
 
+//Elemental unit of an universe
 typedef struct
 {
     int lenght;
     char values[MAX_ELEMENT_LENGTH + 1];
 } Element;
 
+//Set of elements
 typedef struct
 {
     int size;
     Element **elements;
 } Set;
 
+//Pair of two elements
 typedef struct
 {
     Element *elementA;
     Element *elementB;
 } Pair;
 
+//Relation of pairs
 typedef struct
 {
     int size;
     Pair **pairs;
 } Relation;
 
+//Command struct for activating functions
 typedef struct
 {
-    char functionName[MAX_ELEMENT_LENGTH];
+    char functionName[MAX_ELEMENT_LENGTH + 1];
     Set *setA;
     Set *setB;
     Relation *rel;
 } Command;
 
+//Row of an file
+//Contains set or relation or set for an command
 typedef struct
 {
     Set *set;
@@ -55,6 +63,7 @@ typedef struct
     bool command;
 } Row;
 
+//Rows from a file.
 typedef struct
 {
     int size;
@@ -831,10 +840,50 @@ reflexive R - tiskne true nebo false, jestli je relace reflexivní.
 void reflexive(Relation *rel, Set *universe)
 {
     printf("reflexive \n");
-    printf("first relation :\n");
-    printRelation(rel);
-    printf("universe:\n");
-    printSet(universe);
+    //zjistim, zda je vice rel nez universe
+    if(rel->size < universe->size)
+    {
+        printf("FALSE\n");
+    }
+    else
+    {
+        int uni[universe->size];
+        for(int i = 0; i < universe->size; i++)
+        {
+            uni[i] = 0;
+        }
+
+        for(int i = 0; i < rel->size; i++)
+        {
+            if(strcoll(rel->pairs[i]->elementA->values, rel->pairs[i]->elementB->values) == 0)
+            {
+                for(int y = 0; y < universe->size; y++)
+                {
+                    if(strcoll(rel->pairs[i]->elementA->values, universe->elements[y]->values)==0)
+                    {
+                        uni[y] = 1;
+                    }
+                }
+            }
+        }
+        int citac = 0;
+        for(int i = 0; i < universe->size; i++)
+        {
+            if(uni[i] == 1)
+            {
+                citac++;
+            }
+        }
+
+        if(citac == universe->size)
+        {
+            printf("TRUE\n");
+        }
+        else
+        {
+            printf("FALSE\n");
+        }
+    }
 }
 
 /*
@@ -842,12 +891,59 @@ symmetric R - tiskne true nebo false, jestli je relace symetrická.
 */
 void symmetric(Relation *rel, Set *universe)
 {
-    //TODO
     printf("symmetric \n");
-    printf("relation :\n");
-    printRelation(rel);
-    printf("universe:\n");
-    printSet(universe);
+
+    int dvojice[rel->size];
+    for(int i = 0; i <rel->size;i++)
+    {
+        dvojice[i] = 0;
+    }
+
+    //vezmu prvni dvojici
+    for(int i = 0; i < rel->size; i++)
+    {
+        //printf("[%s, %s]\n", rel->pairs[i]->elementA->values, rel->pairs[i]->elementB->values);
+        //zjistim, zda je stejna - napr [A, A]
+        if(strcoll(rel->pairs[i]->elementA->values, rel->pairs[i]->elementB->values) == 0)
+        {
+            dvojice[i] = 1;
+        }
+        else
+        {
+            //beru dvojici na porovnavani
+            for(int y = 0; y < rel->size; y++)
+            {
+                if(i != y)
+                {
+                    if(strcoll(rel->pairs[i]->elementA->values, rel->pairs[y]->elementB->values) == 0)
+                    {
+                        if(strcoll(rel->pairs[i]->elementB->values, rel->pairs[y]->elementA->values)==0)
+                        {
+                            dvojice[i] = 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    int citac = 0;
+    for(int i = 0; i < rel->size; i++)
+    {
+        if(dvojice[i] == 1)
+        {
+            citac++;
+        }
+    }
+
+    if(citac == rel->size)
+    {
+        printf("TRUE\n");
+    }
+    else
+    {
+        printf("FALSE\n");
+    }
 }
 
 /*
@@ -855,12 +951,39 @@ antisymmetric R - tiskne true nebo false, jestli je relace antisymetrická.
 */
 void antisymmetric(Relation *rel, Set *universe)
 {
-    //TODO
     printf("antisymmetric \n");
-    printf("relation :\n");
-    printRelation(rel);
-    printf("universe:\n");
-    printSet(universe);
+
+    int symetrie = 0;
+
+    for(int i = 0; i <rel->size; i++)
+    {
+        //kontrola, zda nejsou stejne
+        if(strcoll(rel->pairs[i]->elementA->values, rel->pairs[i]->elementB->values) != 0)
+        {
+            for(int y = 0; y < rel->size; y++)
+            {
+                if(i != y)
+                {
+                    if(strcoll(rel->pairs[i]->elementA->values, rel->pairs[y]->elementB->values) == 0)
+                    {
+                        if(strcoll(rel->pairs[i]->elementB->values, rel->pairs[y]->elementA->values)==0)
+                        {
+                            symetrie++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if(symetrie == 0)
+    {
+        printf("TRUE\n");
+    }
+    else
+    {
+        printf("FALSE\n");
+    }
 }
 
 /*
@@ -868,12 +991,55 @@ transitive R - tiskne true nebo false, jestli je relace tranzitivní.
 */
 void transitive(Relation *rel, Set *universe)
 {
-    //TODO
     printf("transitive \n");
-    printf("relation :\n");
-    printRelation(rel);
-    printf("universe:\n");
-    printSet(universe);
+
+    int chyba = 0;
+
+    for(int i = 0; i < rel->size; i++)
+    {
+        //kontrola, zda nejsou stejne
+        if(strcoll(rel->pairs[i]->elementA->values, rel->pairs[i]->elementB->values) != 0)
+        {
+            for(int y = 0; y < rel->size; y++)
+            {
+                if(i != y)
+                {
+                    char znak;
+
+                    if(strcoll(rel->pairs[i]->elementB->values, rel->pairs[y]->elementA->values) == 0)
+                    {
+                        int nalezeno = 0;
+
+                        //printf("[%s %s][%s %s]", rel->pairs[i]->elementA->values, rel->pairs[i]->elementB->values, rel->pairs[y]->elementA->values, rel->pairs[y]->elementB->values);
+                        //printf(" hledam [%s %s]\n", rel->pairs[i]->elementA->values, rel->pairs[y]->elementB->values);
+
+                        for(int x = 0; x < rel->size; x++)
+                        {
+                            if((strcoll(rel->pairs[x]->elementA->values, rel->pairs[i]->elementA->values) == 0)
+                              &(strcoll(rel->pairs[x]->elementB->values, rel->pairs[y]->elementB->values) == 0))
+                            {
+                                nalezeno++;
+                                //printf("X [%s %s] \n", rel->pairs[x]->elementA->values, rel->pairs[x]->elementB->values);
+                            }
+                        }
+                        if(nalezeno == 0)
+                        {
+                            chyba++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if(chyba == 0)
+    {
+        printf("TRUE\n");
+    }
+    else
+    {
+        printf("FALSE\n");
+    }
 }
 
 /*
@@ -881,12 +1047,35 @@ function R - tiskne true nebo false, jestli je relace R funkcí.
 */
 void function(Relation *rel, Set *universe)
 {
-    //TODO
     printf("function \n");
-    printf("relation :\n");
-    printRelation(rel);
-    printf("universe:\n");
-    printSet(universe);
+
+    int chyba = 0;
+
+    for(int i = 0; i < rel->size; i++)
+    {
+        for(int y = 0; y < rel->size; y++)
+        {
+            if(i != y)
+            {
+                if(strcoll(rel->pairs[i]->elementA->values, rel->pairs[y]->elementA->values)==0)
+                {
+                    if(strcoll(rel->pairs[i]->elementB->values, rel->pairs[y]->elementB->values)!=0)
+                    {
+                        chyba++;
+                    }
+                }
+            }
+        }
+    }
+
+    if(chyba == 0)
+    {
+        printf("TRUE\n");
+    }
+    else
+    {
+        printf("FALSE\n");
+    }
 }
 
 /*
@@ -894,12 +1083,36 @@ domain R - tiskne definièní obor funkce R (lze aplikovat i na relace - první 
 */
 void domain(Relation *rel, Set *universe)
 {
-    //TODO
     printf("domain \n");
-    printf("relation :\n");
-    printRelation(rel);
-    printf("universe:\n");
-    printSet(universe);
+
+    int vypis[universe->size];
+
+    for(int i = 0; i < universe->size; i++)
+    {
+        vypis[i] = 0;
+    }
+
+    for(int i = 0; i < rel->size; i++)
+    {
+        for(int y = 0; y < universe->size; y++)
+        {
+            if(strcoll(rel->pairs[i]->elementA->values, universe->elements[y]->values) == 0)
+            {
+                vypis[y] = 1;
+            }
+        }
+
+    }
+
+    printf("Definicni obor funkce je: ");
+    for(int i = 0; i < universe->size; i++)
+    {
+        if(vypis[i] == 1)
+        {
+            printf("%s ", universe->elements[i]->values);
+        }
+    }
+    printf("\n");
 }
 
 /*
@@ -907,12 +1120,36 @@ codomain R - tiskne obor hodnot funkce R (lze aplikovat i na relace - druhé prv
 */
 void codomain(Relation *rel, Set *universe)
 {
-    //TODO
     printf("codomain \n");
-    printf("relation :\n");
-    printRelation(rel);
-    printf("universe:\n");
-    printSet(universe);
+
+    int vypis[universe->size];
+
+    for(int i = 0; i < universe->size; i++)
+    {
+        vypis[i] = 0;
+    }
+
+    for(int i = 0; i < rel->size; i++)
+    {
+        for(int y = 0; y < universe->size; y++)
+        {
+            if(strcoll(rel->pairs[i]->elementB->values, universe->elements[y]->values) == 0)
+            {
+                vypis[y] = 1;
+            }
+        }
+
+    }
+
+    printf("Obor hodnot funkce je: ");
+    for(int i = 0; i < universe->size; i++)
+    {
+        if(vypis[i] == 1)
+        {
+            printf("%s ", universe->elements[i]->values);
+        }
+    }
+    printf("\n");
 }
 
 /*
