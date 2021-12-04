@@ -523,14 +523,14 @@ void printBool(bool value){
 void printElements(Element** elements, int size){
     for (int x = 0; x < size; x++)
     {
-        printf("%s ", elements[x]->value);
+        printf(" %s", elements[x]->value);
     }
 }
 
 void printUniverse(Set *universe){
     if (universe != NULL)
     {
-        printf("U ");
+        printf("U");
 
         printElements(universe->elements, universe->size);
 
@@ -542,7 +542,7 @@ void printSet(Set *set)
 {
     if (set != NULL)
     {
-        printf("S ");
+        printf("S");
 
         printElements(set->elements, set->size);
 
@@ -567,12 +567,36 @@ void printRelation(Relation *relation)
 
 // --Set functions--
 
+bool isBiCommand(Command* command){
+    return command->setA != NULL && command->setB != NULL && command->universe != NULL;
+}
+
+Set* getUnSet(Command* command){
+    if(command->universe != NULL){
+        if(command->setA != NULL){
+            return command->setA;
+        }else if(command->setB != NULL){
+            return command->setB;
+        }
+    }
+    return NULL;
+}
+
+bool isRelCommand(Command* command){
+    return command->rel != NULL && command->universe != NULL;
+}
+
 /*
 empty A - tiskne true nebo false podle toho, jestli je množina definovaná na øádku A prázdná nebo neprázdná.
 */
 
 void empty(Command *com)
 {
+    Set* set = getUnSet(com);
+    if(set == NULL){
+        exit(1);
+    }
+
     printBool(com->setA->size == 0);
 }
 
@@ -581,7 +605,12 @@ card A - tiskne poèet prvkù v množinì A (definované na øádku A).
 */
 void card(Command *com)
 {
-    printf("%d \n", com->setA->size);
+    Set* set = getUnSet(com);
+    if(set == NULL){
+        exit(1);
+    }
+
+    printf("%d\n", com->setA->size);
 }
 
 /*
@@ -639,9 +668,15 @@ void setUnion(Command *com)
 /*
 intersect A B - tiskne prùnik množin A a B.
 */
-void intersect(Command *set)
+void intersect(Command *com)
 {
-    /*
+    if(!isBiCommand(com)){
+        exit(1);
+    }
+
+    Set *set1 = com->setA;
+    Set *set2 = com->setB;
+
     int size = set1->size > set2->size ? set1->size : set2->size;
 
     Set* set = initSet(size);
@@ -659,15 +694,21 @@ void intersect(Command *set)
     }
 
     printSet(set);
-    free(set);*/
+    free(set);
 }
 
 /*
 minus A B - tiskne rozdíl množin A \ B.
 */
-void minus(Command *set1)
+void minus(Command *com)
 {
-    /*
+    if(!isBiCommand(com)){
+        exit(1);
+    }
+
+    Set *set1 = com->setA;
+    Set *set2 = com->setB;
+
     int size = set1->size > set2->size ? set1->size : set2->size;
     Set* set = initSet(size);
 
@@ -679,17 +720,18 @@ void minus(Command *set1)
             if (!strcmp(set1->elements[i]->value, set2->elements[j]->value))
             {
                 found = true;
+                break;
             }
         }
 
-        if(!found == false){
+        if(!found){
             set->elements[set->size] = set1->elements[i];
             set->size++;
         }
     }
 
     printSet(set);
-    free(set);*/
+    free(set);
 }
 
 /*
