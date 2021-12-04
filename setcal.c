@@ -554,12 +554,12 @@ void printRelation(Relation *relation)
 {
     if (relation != NULL)
     {
-        printf("R ");
+        printf("R");
         for (int x = 0; x < relation->size; x++)
         {
             Pair *pair = relation->pairs[x];
 
-            printf("(%s %s) ", pair->elementA->value, pair->elementB->value);
+            printf(" (%s %s)", pair->elementA->value, pair->elementB->value);
         }
         printf("\n");
     }
@@ -618,7 +618,13 @@ complement A - tiskne doplnìk množiny A.
 */
 void complement(Command *com)
 {
-    /*
+    Set* set = getUnSet(com);
+    if(set == NULL){
+        exit(1);
+    }
+
+    Set* universe = com->universe;
+
     printf("S");
     for (int i = 0; i < universe->size; i++)
     {
@@ -636,7 +642,7 @@ void complement(Command *com)
             printf(" %s", universe->elements[i]->value);
         }
     }
-    printf("\n");*/
+    printf("\n");
 }
 
 /*
@@ -644,7 +650,13 @@ union A B - tiskne sjednocení množin A a B.
 */
 void setUnion(Command *com)
 {
-    /*
+    if(!isBiCommand(com)){
+        exit(1);
+    }
+
+    Set* set1 = com->setA;
+    Set* set2 = com->setB;
+
     printf("S");
     for(int i=0;i<set1->size;i++){
         bool found = false;
@@ -662,7 +674,6 @@ void setUnion(Command *com)
         printf(" %s", set2->elements[k]->value);
     }
     printf("\n");
-    */
 }
 
 /*
@@ -737,9 +748,15 @@ void minus(Command *com)
 /*
 subseteq A B - tiskne true nebo false podle toho, jestli je množina A podmnožinou množiny B.
 */
-void subseteq(Command *set1)
+void subseteq(Command *com)
 {
-    /*
+    if(!isBiCommand(com)){
+        exit(1);
+    }
+
+    Set *set1 = com->setA;
+    Set *set2 = com->setB;
+
     bool equality = false;
     for (int i = 0; i < set1->size; i++)
     {
@@ -758,15 +775,21 @@ void subseteq(Command *set1)
         }
     }
 
-    printBool(equality);*/
+    printBool(equality);
 }
 
 /*
 subset A B - tiskne true nebo false, jestli je množina A vlastní podmnožina množiny B.
 */
-void subset(Command *set1)
+void subset(Command *com)
 {
-    /*
+    if(!isBiCommand(com)){
+        exit(1);
+    }
+
+    Set *set1 = com->setA;
+    Set *set2 = com->setB;
+
     bool equality = false;
     int counter = 0;
     for (int i = 0; i < set1->size; i++)
@@ -787,15 +810,22 @@ void subset(Command *set1)
         }
     }
 
-    printBool(equality && (counter != set2->size));*/
+    printBool(equality && (counter != set2->size));
 }
 
 /*
 equals A B - tiskne true nebo false, jestli jsou množiny rovny.
 */
-void equals(Command *set2)
+void equals(Command *com)
 {
-    /*
+    if(!isBiCommand(com)){
+        exit(1);
+    }
+
+    Set *set1 = com->setA;
+    Set *set2 = com->setB;
+
+
     bool equality = true;
     for (int i = 0; i < set1->size; i++)
     {
@@ -819,21 +849,27 @@ void equals(Command *set2)
         }
     }
 
-    printBool(equality);*/
+    printBool(equality);
 }
 
 // --Relation functions--
 /*
 reflexive R - tiskne true nebo false, jestli je relace reflexivní.
 */
-void reflexive(Command *rel)
+void reflexive(Command *com)
 {
-    /*
-    printf("reflexive \n");
+    if(!isRelCommand(com)){
+        exit(1);
+    }
+
+    Relation *rel = com->rel;
+    Set *universe = com->universe;
+
+
     //zjistim, zda je vice rel nez universe
     if(rel->size < universe->size)
     {
-        printf("FALSE\n");
+        printf("false\n");
     }
     else
     {
@@ -866,15 +902,21 @@ void reflexive(Command *rel)
         }
 
         printBool(citac == universe->size);
-    }*/
+    }
 }
 
 /*
 symmetric R - tiskne true nebo false, jestli je relace symetrická.
 */
-void symmetric(Command *rel)
+void symmetric(Command *com)
 {
-    /*
+    if(!isRelCommand(com)){
+        exit(1);
+    }
+
+    Relation *rel = com->rel;
+    Set *universe = com->universe;
+
     int dvojice[rel->size];
     for(int i = 0; i <rel->size;i++)
     {
@@ -918,15 +960,21 @@ void symmetric(Command *rel)
         }
     }
 
-    printBool(citac == rel->size);*/
+    printBool(citac == rel->size);
 }
 
 /*
 antisymmetric R - tiskne true nebo false, jestli je relace antisymetrická.
 */
-void antisymmetric(Command *rel)
+void antisymmetric(Command *com)
 {
-    /*
+    if(!isRelCommand(com)){
+        exit(1);
+    }
+
+    Relation *rel = com->rel;
+    Set *universe = com->universe;
+
     int symetrie = 0;
 
     for(int i = 0; i <rel->size; i++)
@@ -950,15 +998,21 @@ void antisymmetric(Command *rel)
         }
     }
 
-    printBool(symetrie == 0);*/
+    printBool(symetrie == 0);
 }
 
 /*
 transitive R - tiskne true nebo false, jestli je relace tranzitivní.
 */
-void transitive(Command *rel)
+void transitive(Command *com)
 {
-    /*
+    if(!isRelCommand(com)){
+        exit(1);
+    }
+
+    Relation *rel = com->rel;
+    Set *universe = com->universe;
+
     int chyba = 0;
 
     for(int i = 0; i < rel->size; i++)
@@ -999,15 +1053,20 @@ void transitive(Command *rel)
     }
 
     printBool(chyba == 0);
-    */
 }
 
 /*
 function R - tiskne true nebo false, jestli je relace R funkcí.
 */
-void function(Command *rel)
+void function(Command *com)
 {
-    /*
+    if(!isRelCommand(com)){
+        exit(1);
+    }
+
+    Relation *rel = com->rel;
+    Set *universe = com->universe;
+
     int chyba = 0;
 
     for(int i = 0; i < rel->size; i++)
@@ -1027,15 +1086,21 @@ void function(Command *rel)
         }
     }
 
-    printBool(chyba == 0);*/
+    printBool(chyba == 0);
 }
 
 /*
 domain R - tiskne definièní obor funkce R (lze aplikovat i na relace - první prvky dvojic).
 */
-void domain(Command *rel)
+void domain(Command *com)
 {
-    /*
+    if(!isRelCommand(com)){
+        exit(1);
+    }
+
+    Relation *rel = com->rel;
+    Set *universe = com->universe;
+
     int vypis[universe->size];
 
     for(int i = 0; i < universe->size; i++)
@@ -1055,22 +1120,29 @@ void domain(Command *rel)
 
     }
 
+    printf("S");
     for(int i = 0; i < universe->size; i++)
     {
         if(vypis[i] == 1)
         {
-            printf("%s ", universe->elements[i]->value);
+            printf(" %s", universe->elements[i]->value);
         }
     }
-    printf("\n");*/
+    printf("\n");
 }
 
 /*
 codomain R - tiskne obor hodnot funkce R (lze aplikovat i na relace - druhé prvky dvojic).
 */
-void codomain(Command *rel)
+void codomain(Command *com)
 {
-    /*
+    if(!isRelCommand(com)){
+        exit(1);
+    }
+
+    Relation *rel = com->rel;
+    Set *universe = com->universe;
+
     int vypis[universe->size];
 
     for(int i = 0; i < universe->size; i++)
@@ -1087,17 +1159,17 @@ void codomain(Command *rel)
                 vypis[y] = 1;
             }
         }
-
     }
 
+    printf("S");
     for(int i = 0; i < universe->size; i++)
     {
         if(vypis[i] == 1)
         {
-            printf("%s ", universe->elements[i]->value);
+            printf(" %s", universe->elements[i]->value);
         }
     }
-    printf("\n");*/
+    printf("\n");
 }
 
 /*
@@ -1302,7 +1374,6 @@ void initFunctions(Function* functions)
 
      strcpy(functions[20].name, "selectFromRelation");
     functions[20].func = selectFromRelation;
-
 
          //triRelFunMap
     strcpy(functions[21].name, "injective");
