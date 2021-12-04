@@ -67,6 +67,7 @@ typedef struct
 typedef struct
 {
     int size;
+    Set* universe;
     Row rows[MAX_ROWS];
 } Data;
 
@@ -253,8 +254,6 @@ Command *parseSetToCommand(Set *set, Data *data)
     {
         strcpy(&command->functionName, &set->elements[0]->values);
 
-        //char *values = set->elements[1]->values;
-
         for (int i = 1; i < set->size && i < 4; i++)
         {
             Row *row = getRow(data, set->elements[i]->values);
@@ -416,6 +415,10 @@ void loadFileData(FILE *file, Data *data)
 
                 relation = NULL;
                 set = initSet();
+
+                if(c == 'U'){
+                    data->universe = set;
+                }
             }
             else if (c == 'R')
             {
@@ -446,82 +449,49 @@ void loadFileData(FILE *file, Data *data)
 }
 
 // --Print functions--
+
+void printElements(Element** elements, int size){
+    for (int x = 0; x < size; x++)
+    {
+        printf("%s ", elements[x]->values);
+    }
+}
+
+void printUniverse(Set *universe){
+    if (universe != NULL)
+    {
+        printf("U ");
+
+        printElements(universe->elements, universe->size);
+
+        printf("\n");
+    }
+}
+
 void printSet(Set *set)
 {
     if (set != NULL)
     {
-        for (int x = 0; x < set->size; x++)
-        {
-            printf(" %s, ", set->elements[x]->values);
-        }
-    }
-    else
-    {
-        printf("Mnozina je prazdna");
-    }
+        printf("S ");
 
-    printf("\n");
+        printElements(set->elements, set->size);
+
+        printf("\n");
+    }
 }
 
 void printRelation(Relation *relation)
 {
     if (relation != NULL)
     {
+        printf("R ");
         for (int x = 0; x < relation->size; x++)
         {
             Pair *pair = relation->pairs[x];
 
-            printf(" Hodnota A %s, hodnota B %s, cela relace je (%s %s) \n",
-                   pair->elementA->values,
-                   pair->elementB->values,
-                   pair->elementA->values,
-                   pair->elementB->values);
+            printf("(%s %s) ", pair->elementA->values, pair->elementB->values);
         }
-    }
-    else
-    {
-        printf("Relace je prazdna");
-    }
-    printf("\n");
-}
-
-void printCommand(Command *command)
-{
-    //control print
-    printf("Prikaz %s, pracuje s \n", command->functionName);
-
-    printSet(command->setA);
-    printf(" a ");
-    printSet(command->setB);
-    printf(" a ");
-    printRelation(command->rel);
-}
-
-void printData(Data *data)
-{
-    for (int i = 0; i <= data->size; i++)
-    {
-        Row row = data->rows[i];
-
-        if (row.relation != NULL)
-        {
-            printf("Na radku %d je relation: \n", i);
-            printRelation(row.relation);
-        }
-        else if (row.set != NULL)
-        {
-            if (row.command)
-            {
-                Command *command = parseSetToCommand(row.set, data);
-                printf("Na radku je %d je prikaz: ", i);
-                printCommand(command);
-            }
-            else
-            {
-                printf("Na radku je %d je mnozina: ", i);
-                printSet(row.set);
-            }
-        }
+        printf("\n");
     }
 }
 
@@ -534,14 +504,6 @@ empty A - tiskne true nebo false podle toho, jestli je množina definovaná na �
 void empty(Set *set, Set *universe)
 {
     (void)universe;
-
-    /*  //TODO
-    printf("empty");
-    printf("first set :\n");
-    printSet(set);
-    printf("universe:\n");
-    printSet(universe);
-*/
 
     if (set->size == 0)
     {
@@ -559,13 +521,6 @@ card A - tiskne poèet prvkù v množinì A (definované na øádku A).
 void card(Set *set, Set *universe)
 {
     (void)universe;
-    //TODO
-    /*  printf("card \n");
-    printf("first set :\n");
-    printSet(set);
-    printf("universe:\n");
-    printSet(universe);
-*/
     printf("%d \n", set->size);
 }
 
@@ -574,12 +529,6 @@ complement A - tiskne doplnìk množiny A.
 */
 void complement(Set *set, Set *universe)
 {
-    /*  //TODO
-    printf("complement \n");
-    printf("first set :\n");
-    printSet(set);
-    printSet(universe);
-*/
     printf("S");
     for (int i = 0; i < universe->size; i++)
     {
@@ -605,16 +554,6 @@ union A B - tiskne sjednocení množin A a B.
 */
 void setUnion(Set *set1, Set *set2, Set *universe)
 {
-    //TODO
-    printf("setUnion \n");
-    printf("first set :\n");
-    printSet(set1);
-    printf("second set :\n");
-    printSet(set2);
-    printf("universe:\n");
-    printSet(universe);
-
-
     printf("S");
     for(int i=0;i<set1->size;i++){
         bool found = false;
@@ -640,14 +579,6 @@ intersect A B - tiskne prùnik množin A a B.
 void intersect(Set *set1, Set *set2, Set *universe)
 {
     (void)universe;
-    /* //TODO
-    printf("intersect \n");
-    printf("first set :\n");
-    printSet(set1);
-    printf("second set :\n");
-    printSet(set2);
-    printf("universe:\n");
-    printSet(universe);*/
 
     printf("S");
     for (int i = 0; i < set1->size; i++)
@@ -670,15 +601,6 @@ minus A B - tiskne rozdíl množin A \ B.
 void minus(Set *set1, Set *set2, Set *universe)
 {
     (void)universe;
-    /*//TODO
-    printf("minus \n");
-    printf("first set :\n");
-    printSet(set1);
-    printf("second set :\n");
-    printSet(set2);
-    printf("universe:\n");
-    printSet(universe);
-    */
     printf("S");
     for (int i = 0; i < set1->size; i++)
     {
@@ -705,15 +627,6 @@ subseteq A B - tiskne true nebo false podle toho, jestli je množina A podmnoži
 void subseteq(Set *set1, Set *set2, Set *universe)
 {
     (void)universe;
-    /*//TODO
-    printf("subseteq \n");
-    printf("first set :\n");
-    printSet(set1);
-    printf("second set :\n");
-    printSet(set2);
-    printf("universe:\n");
-    printSet(universe);
-    */
 
     bool equality = false;
     for (int i = 0; i < set1->size; i++)
@@ -748,15 +661,6 @@ subset A B - tiskne true nebo false, jestli je množina A vlastní podmnožina m
 void subset(Set *set1, Set *set2, Set *universe)
 {
     (void)universe;
-    /*  //TODO
-    printf("subset \n");
-    printf("first set :\n");
-    printSet(set1);
-    printf("second set :\n");
-    printSet(set2);
-    printf("universe:\n");
-    printSet(universe);
-    */
     bool equality = false;
     int counter = 0;
     for (int i = 0; i < set1->size; i++)
@@ -792,15 +696,6 @@ equals A B - tiskne true nebo false, jestli jsou množiny rovny.
 void equals(Set *set1, Set *set2, Set *universe)
 {
     (void)universe;
-    /* //TODO
-    printf("equals \n");
-    printf("first set :\n");
-    printSet(set1);
-    printf("second set :\n");
-    printSet(set2);
-    printf("universe:\n");
-    printSet(universe);*/
-
     bool equality = true;
     for (int i = 0; i < set1->size; i++)
     {
@@ -891,8 +786,6 @@ symmetric R - tiskne true nebo false, jestli je relace symetrická.
 */
 void symmetric(Relation *rel, Set *universe)
 {
-    printf("symmetric \n");
-
     int dvojice[rel->size];
     for(int i = 0; i <rel->size;i++)
     {
@@ -951,8 +844,6 @@ antisymmetric R - tiskne true nebo false, jestli je relace antisymetrická.
 */
 void antisymmetric(Relation *rel, Set *universe)
 {
-    printf("antisymmetric \n");
-
     int symetrie = 0;
 
     for(int i = 0; i <rel->size; i++)
@@ -991,8 +882,6 @@ transitive R - tiskne true nebo false, jestli je relace tranzitivní.
 */
 void transitive(Relation *rel, Set *universe)
 {
-    printf("transitive \n");
-
     int chyba = 0;
 
     for(int i = 0; i < rel->size; i++)
@@ -1047,8 +936,6 @@ function R - tiskne true nebo false, jestli je relace R funkcí.
 */
 void function(Relation *rel, Set *universe)
 {
-    printf("function \n");
-
     int chyba = 0;
 
     for(int i = 0; i < rel->size; i++)
@@ -1083,8 +970,6 @@ domain R - tiskne definièní obor funkce R (lze aplikovat i na relace - první 
 */
 void domain(Relation *rel, Set *universe)
 {
-    printf("domain \n");
-
     int vypis[universe->size];
 
     for(int i = 0; i < universe->size; i++)
@@ -1120,8 +1005,6 @@ codomain R - tiskne obor hodnot funkce R (lze aplikovat i na relace - druhé prv
 */
 void codomain(Relation *rel, Set *universe)
 {
-    printf("codomain \n");
-
     int vypis[universe->size];
 
     for(int i = 0; i < universe->size; i++)
@@ -1158,7 +1041,7 @@ injective R - tiskne true nebo false, jestli je funkce R injektivní.
 void injective(Relation *rel, Set *set1, Set *set2, Set *universe)
 {
     //TODO
-    printf("injective \n");
+   /* printf("injective \n");
     printf("relation :\n");
     printRelation(rel);
     printf("first set");
@@ -1166,7 +1049,7 @@ void injective(Relation *rel, Set *set1, Set *set2, Set *universe)
     printf("second set");
     printSet(set2);
     printf("universe:\n");
-    printSet(universe);
+    printSet(universe); */
 }
 
 /*
@@ -1175,7 +1058,7 @@ surjective R - tiskne true nebo false, jestli je funkce R surjektivní.
 void surjective(Relation *rel, Set *set1, Set *set2, Set *universe)
 {
     //TODO
-    printf("surjective \n");
+    /* printf("surjective \n");
     printf("relation :\n");
     printRelation(rel);
     printf("first set");
@@ -1183,7 +1066,7 @@ void surjective(Relation *rel, Set *set1, Set *set2, Set *universe)
     printf("second set");
     printSet(set2);
     printf("universe:\n");
-    printSet(universe);
+    printSet(universe);*/
 }
 
 /*
@@ -1192,7 +1075,7 @@ bijective R - tiskne true nebo false, jestli je funkce R bijektivní.
 void bijective(Relation *rel, Set *set1, Set *set2, Set *universe)
 {
     //TODO
-    printf("bijective \n");
+   /* printf("bijective \n");
     printf("relation :\n");
     printRelation(rel);
     printf("first set");
@@ -1200,7 +1083,7 @@ void bijective(Relation *rel, Set *set1, Set *set2, Set *universe)
     printf("second set");
     printSet(set2);
     printf("universe:\n");
-    printSet(universe);
+    printSet(universe);*/
 }
 
 //Advanced commmands
@@ -1211,11 +1094,11 @@ closure_ref R - tiskne reflexivní uzávìr relace R
 void closureRef(Relation *rel, Set *universe)
 {
     //TODO
-    printf("closureRef \n");
+   /* printf("closureRef \n");
     printf("relation :\n");
     printRelation(rel);
     printf("universe:\n");
-    printSet(universe);
+    printSet(universe);*/
 }
 
 /*
@@ -1224,11 +1107,11 @@ closure_sym R - tiskne symetrický uzávìr relace R
 void closureSym(Relation *rel, Set *universe)
 {
     //TODO
-    printf("closureSym \n");
+    /*printf("closureSym \n");
     printf("relation :\n");
     printRelation(rel);
     printf("universe:\n");
-    printSet(universe);
+    printSet(universe);*/
 }
 
 /*
@@ -1237,11 +1120,11 @@ closure_trans R - tiskne tranzitivní uzávìr relace R
 void closureTrans(Relation *rel, Set *universe)
 {
     //TODO
-    printf("closureTrans \n");
+    /*printf("closureTrans \n");
     printf("relation :\n");
     printRelation(rel);
     printf("universe:\n");
-    printSet(universe);
+    printSet(universe);*/
 }
 
 //-- Bonus --
@@ -1287,8 +1170,7 @@ void executeFunUnSet(Command *com, Data *data)
         {"card", card},
         {"complement", complement},
         //Bonus
-        {"selectFromSet", selectFromSet}
-
+        {"select", selectFromSet}
     };
 
     for (long unsigned int i = 0; i < (sizeof(functionMap) / sizeof(functionMap[0])); i++)
@@ -1307,14 +1189,14 @@ void executeFunBinSet(Command *com, Data *data)
         const char *name;
         void (*func)(Set *set1, Set *set2, Set *universe);
     } functionMap[] = {
-        {"setUnion", setUnion},
+        {"union", setUnion},
         {"intersect", intersect},
         {"minus", minus},
         {"subseteq", subseteq},
         {"subset", subset},
         {"equals", equals}
-
     };
+
     bool found = false;
 
     for (long unsigned int i = 0; i < (sizeof(functionMap) / sizeof(functionMap[0])); i++)
@@ -1332,6 +1214,7 @@ void executeFunBinSet(Command *com, Data *data)
         exit(1);
     }
 }
+
 void executeFunUnRel(Command *com, Data *data)
 {
 
@@ -1429,23 +1312,32 @@ int main(int argc, char *argv[])
 
     if (file == NULL)
     {
-        fprintf(stderr, "file did not open \n");
+        fprintf(stderr, "Could not open a file");
         return 1;
     }
 
     loadFileData(file, data);
 
-    //  printData(data);
+    printUniverse(data->universe);
 
-    for (int i = 0; i < data->size; i++)
+    for (int i = 1; i < data->size; i++)
     {
         Row *row = &data->rows[i];
-        if (row->set != NULL && row->command)
+        if (row->set != NULL)
         {
-            Command *command = parseSetToCommand(row->set, data);
-            // printCommand(command);
-            functionLookup(command, data);
-            free(command);
+            if(row->command){
+                Command *command = parseSetToCommand(row->set, data);
+                functionLookup(command, data);
+                free(command);
+            }else{
+                printSet(row->set);
+            }
+        }else if(row->relation != NULL)
+        {
+            printRelation(row->relation);
+        }else{
+            fprintf(stderr, "Invalid row");
+            return 1;
         }
     }
 
