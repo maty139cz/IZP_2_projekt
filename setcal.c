@@ -1,7 +1,7 @@
-﻿/*
- @authors:  Kolarik Cestmír, Cermak  Matous, Balusek Pavel, Hnat Filip
- @name: setcal.c
-*/
+﻿/**
+* @authors:  Kolarik Cestmír, Cermak  Matous, Balusek Pavel, Hnat Filip
+* @name: setcal.c
+**/
 
 // Basic libraries.
 #include <stdio.h>
@@ -1118,8 +1118,9 @@ void intersect(Command *com)
         }
     }
 
-    printSet(set);
-    freeSet(set);
+   printSet(set);
+    free(set->elements);
+    free(set);
 }
 
 /*
@@ -1157,9 +1158,10 @@ void minus(Command *com)
             set->size++;
         }
     }
-
+    
     printSet(set);
-    freeSet(set);
+    free(set->elements);
+    free(set);
 }
 
 /*
@@ -1584,13 +1586,16 @@ injective R - tiskne true nebo false, jestli je funkce R injektivní.
 */
 void injective(Command *com)
 {
-    checkArguments(com, 3);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
+   if (!isRelCommand(com) || !isBiCommand(com) || com->count - 1 > 3)
+    {
+        com->success = false;
+        return;
     }
-    Relation *rel=com->rel;
+ Relation *rel = com->rel;
+    Set *setA=com->setA;
+    Set *setB=com->setB;
 
-
+    //fun start 
   int ok = 1;
 
     for(int i = 0; i < rel->size; i++)
@@ -1615,11 +1620,16 @@ surjective R - tiskne true nebo false, jestli je funkce R surjektivní.
 */
 void surjective(Command *com)
 {
-    checkArguments(com, 3);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
+    
+    if (!isRelCommand(com) || !isBiCommand(com) || com->count - 1 > 3)
+    {
+        com->success = false;
+        return;
     }
-    Relation *rel = com->rel;
+   Relation *rel = com->rel;
+    Set *setA=com->setA;
+    Set *setB=com->setB;
+    //fun start 
      int ok = 1;
 
     for(int i = 0; i < rel->size; i++)
@@ -1643,11 +1653,15 @@ bijective R - tiskne true nebo false, jestli je funkce R bijektivní.
 */
 void bijective(Command *com)
 {
-    checkArguments(com, 3);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
+   if (!isRelCommand(com) || !isBiCommand(com) || com->count - 1 > 3)
+    {
+        com->success = false;
+        return;
     }
     Relation *rel = com->rel;
+    Set *setA=com->setA;
+    Set *setB=com->setB;
+    //fun start 
    int ok = 1;
 
     for(int i = 0; i < rel->size; i++)
@@ -1669,58 +1683,6 @@ void bijective(Command *com)
         }
     }
     printBool(ok==1);
-}
-
-//Advanced commmands
-
-/*
-closure_ref R - tiskne reflexivní uzávìr relace R
-*/
-void closureRef(Command *com)
-{
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
-    }
-      //  printRelation(com->rel);
-}
-
-/*
-closure_sym R - tiskne symetrický uzávìr relace R
-*/
-void closureSym(Command *com)
-{
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
-    }
-      //  printRelation(com->rel);
-}
-
-/*
-closure_trans R - tiskne tranzitivní uzávìr relace R
-*/
-void closureTrans(Command *com)
-{
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
-    }
-       // printRelation(com->rel);
-}
-
-//-- Bonus --
-/*
-select A N - vybere náhodný prvek z množiny nebo relace A a tiskne ho. V pøípadì, že je množina A prázdná, pøeskoèí vykonávání pøíkazu na øádek N vstupního souboru. N v takovém pøípadì musí oznaèovat existující øádek ve vstupním souboru.
-*/
-void selectFromRelation(Command *com)
-{
-    checkArguments(com, 1);
-     //   printRelation(com->rel);
-}
-
-void selectFromSet(Command *com)
-{
-   (void)com;
 }
 
 // Command functions
