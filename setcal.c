@@ -1584,25 +1584,15 @@ injective R - tiskne true nebo false, jestli je funkce R injektivní.
 */
 void injective(Command *com)
 {
-<<<<<<< Updated upstream
-    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
-    {
-        com->success = false;
-        return;
-=======
     checkArguments(com, 3);
     if(!isRelCommand(com) || isBiCommand(com)){
         exitFunction();
->>>>>>> Stashed changes
     }
     Relation *rel=com->rel;
 
 
   int ok = 1;
 
-<<<<<<< Updated upstream
-    // printRelation(com->rel);
-=======
     for(int i = 0; i < rel->size; i++)
     {
         for(int y = 0; y < rel->size; y++)
@@ -1618,7 +1608,6 @@ void injective(Command *com)
     }
 
     printBool(ok==1);
->>>>>>> Stashed changes
 }
 
 /*
@@ -1626,14 +1615,6 @@ surjective R - tiskne true nebo false, jestli je funkce R surjektivní.
 */
 void surjective(Command *com)
 {
-<<<<<<< Updated upstream
-    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
-    {
-        com->success = false;
-        return;
-    }
-    // printRelation(com->rel);
-=======
     checkArguments(com, 3);
     if(!isRelCommand(com) || isBiCommand(com)){
         exitFunction();
@@ -1655,7 +1636,6 @@ void surjective(Command *com)
         }
     }
     printBool(ok==1);
->>>>>>> Stashed changes
 }
 
 /*
@@ -1663,14 +1643,6 @@ bijective R - tiskne true nebo false, jestli je funkce R bijektivní.
 */
 void bijective(Command *com)
 {
-<<<<<<< Updated upstream
-    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
-    {
-        com->success = false;
-        return;
-    }
-    // printRelation(com->rel);
-=======
     checkArguments(com, 3);
     if(!isRelCommand(com) || isBiCommand(com)){
         exitFunction();
@@ -1749,7 +1721,6 @@ void selectFromRelation(Command *com)
 void selectFromSet(Command *com)
 {
    (void)com;
->>>>>>> Stashed changes
 }
 
 // Command functions
