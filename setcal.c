@@ -1,7 +1,7 @@
-﻿/*
- @authors:  Kolarik Cestmír, Cermak  Matous, Balusek Pavel, Hnat Filip
- @name: setcal.c
-*/
+﻿/**
+* @authors:  Kolarik Cestmír, Cermak  Matous, Balusek Pavel, Hnat Filip
+* @name: setcal.c
+**/
 
 // Basic libraries.
 #include <stdio.h>
@@ -1118,8 +1118,9 @@ void intersect(Command *com)
         }
     }
 
-    printSet(set);
-    freeSet(set);
+   printSet(set);
+    free(set->elements);
+    free(set);
 }
 
 /*
@@ -1157,9 +1158,10 @@ void minus(Command *com)
             set->size++;
         }
     }
-
+    
     printSet(set);
-    freeSet(set);
+    free(set->elements);
+    free(set);
 }
 
 /*
@@ -1584,13 +1586,33 @@ injective R - tiskne true nebo false, jestli je funkce R injektivní.
 */
 void injective(Command *com)
 {
-    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
+   if (!isRelCommand(com) || !isBiCommand(com) || com->count - 1 > 3)
     {
         com->success = false;
         return;
     }
+ Relation *rel = com->rel;
+    Set *setA=com->setA;
+    Set *setB=com->setB;
 
-    // printRelation(com->rel);
+    //fun start 
+  int ok = 1;
+
+    for(int i = 0; i < rel->size; i++)
+    {
+        for(int y = 0; y < rel->size; y++)
+        {
+            if(i != y)
+            {
+                if(strcoll(rel->pairs[i]->elementA->value, rel->pairs[y]->elementA->value) == 0)
+                {
+                    ok = 0; //konec
+                }
+            }
+        }
+    }
+
+    printBool(ok==1);
 }
 
 /*
@@ -1598,12 +1620,32 @@ surjective R - tiskne true nebo false, jestli je funkce R surjektivní.
 */
 void surjective(Command *com)
 {
-    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
+    
+    if (!isRelCommand(com) || !isBiCommand(com) || com->count - 1 > 3)
     {
         com->success = false;
         return;
     }
-    // printRelation(com->rel);
+   Relation *rel = com->rel;
+    Set *setA=com->setA;
+    Set *setB=com->setB;
+    //fun start 
+     int ok = 1;
+
+    for(int i = 0; i < rel->size; i++)
+    {
+        for(int y = 0; y < rel->size; y++)
+        {
+            if(i != y)
+            {
+                if(strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementB->value) == 0)
+                {
+                    ok = 0; //konec
+                }
+            }
+        }
+    }
+    printBool(ok==1);
 }
 
 /*
@@ -1611,12 +1653,36 @@ bijective R - tiskne true nebo false, jestli je funkce R bijektivní.
 */
 void bijective(Command *com)
 {
-    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
+   if (!isRelCommand(com) || !isBiCommand(com) || com->count - 1 > 3)
     {
         com->success = false;
         return;
     }
-    // printRelation(com->rel);
+    Relation *rel = com->rel;
+    Set *setA=com->setA;
+    Set *setB=com->setB;
+    //fun start 
+   int ok = 1;
+
+    for(int i = 0; i < rel->size; i++)
+    {
+        for(int y = 0; y < rel->size; y++)
+        {
+            if(i != y)
+            {
+                if(strcoll(rel->pairs[i]->elementA->value, rel->pairs[y]->elementA->value) == 0)
+                {
+                    ok = 0; //konec
+                }
+                
+                if(strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementB->value) == 0)
+                {
+                    ok = 0; //konec
+                }
+            }
+        }
+    }
+    printBool(ok==1);
 }
 
 // Command functions
