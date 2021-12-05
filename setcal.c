@@ -972,25 +972,20 @@ void subseteq(Command *com)
     Set *set1 = com->setA;
     Set *set2 = com->setB;
 
-    bool equality = false;
-    for (int i = 0; i < set1->size; i++)
-    {
-        equality = false;
-        for (int j = 0; j < set2->size; j++)
+    if(com->setA->size > 0){
+
+        for (int i = 0; i < set1->size; i++)
         {
-            if (strcmp(set1->elements[i]->value, set2->elements[j]->value) == 0)
-            {
-                equality = true;
-                break;
+            Element* elementA = set1->elements[i];
+
+            if (!isInSet(elementA->value, set2)){
+                printBool(false);
+                return;
             }
-        }
-        if (equality == false)
-        {
-            break;
         }
     }
 
-    printBool(equality);
+    printBool(com->setA->size <= set2->size);
 }
 
 /*
@@ -1006,27 +1001,20 @@ void subset(Command *com)
     Set *set1 = com->setA;
     Set *set2 = com->setB;
 
-    bool equality = false;
-    int counter = 0;
-    for (int i = 0; i < set1->size; i++)
-    {
-        equality = false;
-        for (int j = 0; j < set2->size; j++)
+    if(com->setA->size > 0){
+
+        for (int i = 0; i < set1->size; i++)
         {
-            if (strcmp(set1->elements[i]->value, set2->elements[j]->value) == 0)
-            {
-                counter++;
-                equality = true;
-                break;
+            Element* elementA = set1->elements[i];
+
+            if (!isInSet(elementA->value, set2)){
+                printBool(false);
+                return;
             }
-        }
-        if (equality == false)
-        {
-            break;
         }
     }
 
-    printBool(equality && (counter != set2->size));
+    printBool(com->setA->size < set2->size);
 }
 
 /*
@@ -1042,31 +1030,20 @@ void equals(Command *com)
     Set *set1 = com->setA;
     Set *set2 = com->setB;
 
+    if(com->setA->size > 0){
 
-    bool equality = true;
-    for (int i = 0; i < set1->size; i++)
-    {
-        for (int j = 0; j < set2->size + 1; j++)
+        for (int i = 0; i < set1->size; i++)
         {
-            if (strcmp(set1->elements[i]->value, set2->elements[j]->value) == 0)
-            {
-                break;
+            Element* elementA = set1->elements[i];
+
+            if (!isInSet(elementA->value, set2)){
+                printBool(false);
+                return;
             }
-            else
-            {
-                if (set2->size == j)
-                {
-                    equality = false;
-                }
-            }
-        }
-        if (equality == false)
-        {
-            break;
         }
     }
 
-    printBool(equality);
+    printBool(com->setA->size == set2->size);
 }
 
 // --Relation functions--
