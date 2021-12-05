@@ -82,7 +82,7 @@ typedef struct
 {
     int size;
     Set* universe;
-    Row rows[MAX_ROWS];
+    Row rows[MAX_ROWS + 1];
 } Data;
 
 //--Function structs--
@@ -104,7 +104,7 @@ Element *initElement()
 Set *initSet(int size)
 {
     Set *set = malloc(sizeof(Set));
-    set->elements = (Element **)malloc(size);
+    set->elements = (Element **)malloc(size * sizeof(Element*));
     set->size = 0;
     set->elements[0] = NULL;
     return set;
@@ -428,6 +428,23 @@ bool finishLastPair(Relation *relation)
     return true;
 }
 
+void addCharToElement(Element* element, char c){
+    if(element != NULL){
+        if(element->lenght < MAX_ELEMENT_LENGTH){
+            if(isCharCapitalLetter(c) || isCharLetter(c)){
+                element->value[element->lenght] = c;
+                element->lenght++;
+            }else{
+                fprintf(stderr, "Element has special character or number");
+                exit(1);
+            }
+        }else{
+            fprintf(stderr, "Size of element reached");
+            exit(1);
+        }
+    }
+}
+
 //Returns if set has ended
 bool parseToSet(Set *set, char c)
 {
@@ -455,18 +472,7 @@ bool parseToSet(Set *set, char c)
     }
     else
     {
-        if(element->lenght < MAX_ELEMENT_LENGTH){
-            if(isCharCapitalLetter(c) || isCharLetter(c)){
-                element->value[element->lenght] = c;
-                element->lenght++;
-            }else{
-                fprintf(stderr, "Set has special character or number");
-                exit(1);
-            }
-        }else{
-            fprintf(stderr, "Size of element reached");
-            exit(1);
-        }
+        addCharToElement(element, c);
     }
 
     return false;
@@ -508,11 +514,7 @@ void parseToRelation(Relation *relation, char c)
         }
     }
 
-    if (element != NULL)
-    {
-        element->value[element->lenght] = c;
-        element->lenght++;
-    }
+    addCharToElement(element, c);
 }
 
 bool isSetValid(Set* set, Set* universe){
@@ -550,7 +552,7 @@ void loadUniverse(Data* data, FILE* file){
     char c = getc(file);
 
     if(c == 'U'){
-        Set *universe = initSet(sizeof(Element *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+        Set *universe = initSet(DEFAULT_ELEMENT_ARRAY_LENGHT);
 
         do
         {
@@ -564,11 +566,23 @@ void loadUniverse(Data* data, FILE* file){
 }
 
 void checkRelation(Relation* relation, Set* universe){
-
+    for(int i = 0; i < relation->size; i++){
+        Pair* pair = relation->pairs[i];
+        if(!isInSet(pair->elementA->value, universe) || !isInSet(pair->elementB->value, universe) ){
+            fprintf(stderr, "Element of a relation is not in universe");
+            exit(1);
+        }
+    }
 }
 
 void checkSet(Set* set, Set* universe){
-
+    for(int i = 0; i < set->size; i++){
+        Element* element = set->elements[i];
+        if(!isInSet(element->value, universe)){
+            fprintf(stderr, "Element %s of a set is not in universe", element->value);
+            exit(1);
+        }
+    }
 }
 
 void loadFileData(FILE *file, Data *data)
@@ -596,7 +610,7 @@ void loadFileData(FILE *file, Data *data)
 
             if (c == 'S')
             {
-                set = initSet(sizeof(Element *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+                set = initSet(DEFAULT_ELEMENT_ARRAY_LENGHT);
             }
             else if (c == 'R')
             {
@@ -625,11 +639,22 @@ void loadFileData(FILE *file, Data *data)
 
          if (parseToSet(set, c) || c == '\n' || c == EOF)
         {
+            if(set != NULL){
+                checkSet(set, data->universe);
+            }else if (relation != NULL){
+                checkRelation(relation, data->universe);
+            }
+
             data->size++;
             first = true;
         }
 
     } while (c != EOF && data->size <= MAX_ROWS);
+
+    if(data->size > MAX_ROWS){
+        fprintf(stderr, "Too many rows, maximum is 1000");
+        exit(1);
+    }
 }
 
 // --Print functions--
