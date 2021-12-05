@@ -18,6 +18,14 @@
 //function counts
 #define FUNCTION_COUNT 25
 
+#define COMMAND_SIZE 4
+
+#define LARGEST_C_LETTER_CHAR 'Z'
+#define SMALLEST_C_LETTER_CHAR 'A'
+
+#define LARGEST_LETTER_CHAR 'z'
+#define SMALLEST_LETTER_CHAR 'a'
+
 #define LARGEST_NUMBER_CHAR '9'
 #define SMALLEST_NUMBER_CHAR '0'
 
@@ -52,11 +60,12 @@ typedef struct
 //Command struct for activating functions
 typedef struct
 {
-    char functionName[MAX_ELEMENT_LENGTH + 1];
+    int count;
     Set *setA;
     Set *setB;
     Relation *rel;
     Set* universe;
+    Element data[COMMAND_SIZE];
 } Command;
 
 //Row of an file
@@ -65,7 +74,7 @@ typedef struct
 {
     Set *set;
     Relation *relation;
-    bool command;
+    Command *command;
 } Row;
 
 //Rows from a file.
@@ -136,11 +145,36 @@ Command *initCommand()
     command->setA = NULL;
     command->setB = NULL;
     command->rel = NULL;
+    command->universe = NULL;
+    command->count = 0;
+
+    for(int i = 0; i < COMMAND_SIZE; i ++){
+        command->data[i].lenght = 0;
+    }
 
     return command;
 }
 
 // --Free functions--
+bool isInSet(char* value, Set* set){
+    for (int i = 0; i < set->size; i++)
+    {
+        if (!strcmp(value, set->elements[i]->value))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void printElements(Element** elements, int size){
+    for (int x = 0; x < size; x++)
+    {
+        printf(" %s", elements[x]->value);
+    }
+}
+
 void freeElement(Element *element)
 {
     free(element);
@@ -159,7 +193,7 @@ void freeReleation(Relation *relation)
     {
         freePair(relation->pairs[i]);
     }
-
+    free(relation->pairs);
     free(relation);
 }
 
@@ -169,6 +203,7 @@ void freeSet(Set *set)
     {
         freeElement(set->elements[i]);
     }
+    free(set->elements);
     free(set);
 }
 
@@ -186,6 +221,8 @@ void freeData(Data *data)
         if (row.set != NULL)
         {
             freeSet(row.set);
+        }else if(row.command != NULL){
+            free(row.command);
         }
     }
 
@@ -193,6 +230,49 @@ void freeData(Data *data)
 }
 
 // --Util functions--
+
+void finishElement(Element *element)
+{
+    if (element->lenght < MAX_ELEMENT_LENGTH)
+    {
+        element->value[element->lenght + 1] = '\0';
+    }
+}
+
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+  * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
+bool isCharInRange(char ch, int minChar, int maxChar)
+{
+    return ch >= minChar && ch <= maxChar;
+}
+
+/**
+ * Uses isCharInRange function
+ * Range is set between lowest and highest capital letters ASCII characters
+ * @param {char} ch - character to check
+ * @returns {bool} true if character is in range of ASCII capital letters
+ */
+bool isCharCapitalLetter(char ch)
+{
+    return isCharInRange(ch, SMALLEST_C_LETTER_CHAR, LARGEST_C_LETTER_CHAR);
+}
+
+/**
+ * Uses isCharInRange function
+ * Range is set between lowest and highest letters ASCII characters
+ * @param {char} ch - character to check
+ * @returns {bool} true if character is in range of ASCII letters
+ */
+bool isCharLetter(char ch)
+{
+    return isCharInRange(ch, SMALLEST_LETTER_CHAR, LARGEST_LETTER_CHAR);
+}
+
 
 /**
  * Uses isCharInRange function
@@ -202,7 +282,7 @@ void freeData(Data *data)
  */
 bool isCharNumber(char ch)
 {
-    return ch >= SMALLEST_NUMBER_CHAR && ch <= LARGEST_NUMBER_CHAR ? true : false;
+    return isCharInRange(ch, SMALLEST_NUMBER_CHAR, LARGEST_NUMBER_CHAR);
 }
 
 /**
@@ -217,7 +297,7 @@ bool isPositiveNumber(char *string)
         //if character contains non string, then the string is not a number
         if (!isCharNumber(string[i]))
         {
-            fprintf(stderr, "Value is not positive number\n", string);
+            fprintf(stderr, "Value is not positive number\n");
             return false;
         }
         i++;
@@ -258,51 +338,67 @@ Row *getRow(Data *data, char *value)
     return NULL;
 }
 
-Command *parseSetToCommand(Set *set, Data *data)
-{
-    Command *command = initCommand();
-    command->universe = data->universe;
+void finishCommand(Command* command, Data* data){
+    Element* element = &command->data[command->count];
 
-    if (set->size > 0)
-    {
-        strcpy(&command->functionName, &set->elements[0]->value);
-
-        for (int i = 1; i < set->size && i < 4; i++)
-        {
-            Row *row = getRow(data, set->elements[i]->value);
-            if (row != NULL)
-            {
-                addRowToCommand(command, row);
-            }
-            else
-            {
-                break;
-            }
-        }
+    if(element->lenght > 0){
+        finishElement(element);
+        command->count++;
     }
 
-    return command;
+    for (int i = 1; i < command->count; i++)
+    {
+        Row *row = getRow(data, command->data[i].value);
+        if (row != NULL)
+        {
+            addRowToCommand(command, row);
+        }
+        else
+        {
+            break;
+        }
+    }
 }
 
-void addSetElement(Set *set, Element *element)
+void parseToCommand(Command* command, char c)
 {
+    Element *element = &command->data[command->count];
+
+    if(c == ' '){
+        if(element->lenght > 0){
+            finishElement(element);
+            command->count ++;
+        }
+    }else{
+        element->value[element->lenght] = c;
+        element->lenght++;
+    }
+}
+
+bool addSetElement(Set *set, Element *element)
+{
+    if(isInSet(element->value, set)){
+        fprintf(stderr, "Element %s already in set. \n", element->value);
+        exit(1);
+    }
+
     set->elements[set->size] = element;
     set->size++;
 
     if (set->size > 0 && set->size % DEFAULT_ELEMENT_ARRAY_LENGHT)
     {
-        set->elements = (Element **)realloc(set->elements, set->size + sizeof(Element *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+        Element** elements = (Element **)realloc(set->elements, sizeof(Element *) * set->size + sizeof(Element *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+
+        if(elements != NULL){
+            set->elements = elements;
+        }else{
+            return false;
+        }
     }
 
     set->elements[set->size] = initElement();
-}
 
-void finishElement(Element *element)
-{
-    if (element->lenght < MAX_ELEMENT_LENGTH)
-    {
-        element->value[element->lenght + 1] = '\0';
-    }
+    return true;
 }
 
 void finishPair(Pair *pair)
@@ -311,22 +407,34 @@ void finishPair(Pair *pair)
     finishElement(pair->elementB);
 }
 
-void finishLastPair(Relation *relation)
+bool finishLastPair(Relation *relation)
 {
     finishPair(relation->pairs[relation->size]);
     relation->size++;
 
     if (relation->size > 0 && relation->size % DEFAULT_ELEMENT_ARRAY_LENGHT)
     {
-        relation->pairs = (Pair **)realloc(relation->pairs, relation->size + sizeof(Pair *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+        Pair** pairs = (Pair **)realloc(relation->pairs, relation->size + sizeof(Pair *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+
+        if(pairs != NULL){
+            relation->pairs = pairs;
+        }else{
+            return false;
+        }
     }
 
     relation->pairs[relation->size] = NULL;
+
+    return true;
 }
 
 //Returns if set has ended
 bool parseToSet(Set *set, char c)
 {
+    if(set == NULL){
+        return false;
+    }
+
     Element *element = set->elements[set->size];
 
     if (c == ' ' || c == '\n' || c == EOF)
@@ -347,8 +455,18 @@ bool parseToSet(Set *set, char c)
     }
     else
     {
-        element->value[element->lenght] = c;
-        element->lenght++;
+        if(element->lenght < MAX_ELEMENT_LENGTH){
+            if(isCharCapitalLetter(c) || isCharLetter(c)){
+                element->value[element->lenght] = c;
+                element->lenght++;
+            }else{
+                fprintf(stderr, "Set has special character or number");
+                exit(1);
+            }
+        }else{
+            fprintf(stderr, "Size of element reached");
+            exit(1);
+        }
     }
 
     return false;
@@ -397,16 +515,6 @@ void parseToRelation(Relation *relation, char c)
     }
 }
 
-bool isInSet(char* value, Set* set){
-    for (int i = 0; i < set->size; i++)
-    {
-        if (!strcmp(value, set->elements[i]->value))
-        {
-            return true;
-        }
-    }
-}
-
 bool isSetValid(Set* set, Set* universe){
     for (int i = 0; i < set->size; i++)
     {
@@ -439,18 +547,15 @@ bool isUniverseValid(Function* functions, Set* set){
 
 // --Data processing--
 void loadUniverse(Data* data, FILE* file){
-    Set *universe;
-
     char c = getc(file);
 
     if(c == 'U'){
-        universe = initSet(sizeof(Element *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+        Set *universe = initSet(sizeof(Element *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
 
         do
         {
             c = getc(file);
-            parseToSet(universe, c);
-        }while (c != '\n' && c != EOF);
+        }while (!parseToSet(universe, c));
 
         data->universe = universe;
         data->rows[data->size].set = universe;
@@ -458,10 +563,19 @@ void loadUniverse(Data* data, FILE* file){
     }
 }
 
+void checkRelation(Relation* relation, Set* universe){
+
+}
+
+void checkSet(Set* set, Set* universe){
+
+}
+
 void loadFileData(FILE *file, Data *data)
 {
     Relation *relation = NULL;
     Set *set = NULL;
+    Command *command = NULL;
     Row *row = NULL;
 
     bool first = true;
@@ -476,41 +590,45 @@ void loadFileData(FILE *file, Data *data)
         {
             row = &data->rows[data->size];
 
-            if (c == 'S' || c == 'C')
-            {
-                if (c == 'C')
-                {
-                    row->command = true;
-                }
+            relation = NULL;
+            set = NULL;
+            command = NULL;
 
-                relation = NULL;
+            if (c == 'S')
+            {
                 set = initSet(sizeof(Element *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
             }
             else if (c == 'R')
             {
-                row->relation = malloc(sizeof(Relation));
-                row->set = NULL;
-
-                set = NULL;
                 relation = initRelation();
+            }else if(c == 'C'){
+                command = initCommand();
+                command->universe = data->universe;
             }
 
             row->relation = relation;
             row->set = set;
+            row->command = command;
 
             first = false;
             continue;
         }
 
-        if (relation != NULL && c != '\n')
-        {
-            parseToRelation(relation, c);
+        if(c != '\n' && c != EOF){
+            if(command != NULL){
+                parseToCommand(command, c);
+            } else if (relation != NULL)
+            {
+                parseToRelation(relation, c);
+            }
         }
-        else if (set != NULL && parseToSet(set, c) || c == '\n' || c == EOF)
+
+         if (parseToSet(set, c) || c == '\n' || c == EOF)
         {
             data->size++;
             first = true;
         }
+
     } while (c != EOF && data->size <= MAX_ROWS);
 }
 
@@ -518,13 +636,6 @@ void loadFileData(FILE *file, Data *data)
 
 void printBool(bool value){
     value ? printf("true\n") : printf("false\n");
-}
-
-void printElements(Element** elements, int size){
-    for (int x = 0; x < size; x++)
-    {
-        printf(" %s", elements[x]->value);
-    }
 }
 
 void printUniverse(Set *universe){
@@ -915,7 +1026,6 @@ void symmetric(Command *com)
     }
 
     Relation *rel = com->rel;
-    Set *universe = com->universe;
 
     int dvojice[rel->size];
     for(int i = 0; i <rel->size;i++)
@@ -973,7 +1083,6 @@ void antisymmetric(Command *com)
     }
 
     Relation *rel = com->rel;
-    Set *universe = com->universe;
 
     int symetrie = 0;
 
@@ -1011,7 +1120,6 @@ void transitive(Command *com)
     }
 
     Relation *rel = com->rel;
-    Set *universe = com->universe;
 
     int chyba = 0;
 
@@ -1024,14 +1132,9 @@ void transitive(Command *com)
             {
                 if(i != y)
                 {
-                    char znak;
-
                     if(strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementA->value) == 0)
                     {
                         int nalezeno = 0;
-
-                        //printf("[%s %s][%s %s]", rel->pairs[i]->elementA->value, rel->pairs[i]->elementB->value, rel->pairs[y]->elementA->value, rel->pairs[y]->elementB->value);
-                        //printf(" hledam [%s %s]\n", rel->pairs[i]->elementA->value, rel->pairs[y]->elementB->value);
 
                         for(int x = 0; x < rel->size; x++)
                         {
@@ -1039,7 +1142,6 @@ void transitive(Command *com)
                               &(strcoll(rel->pairs[x]->elementB->value, rel->pairs[y]->elementB->value) == 0))
                             {
                                 nalezeno++;
-                                //printf("X [%s %s] \n", rel->pairs[x]->elementA->value, rel->pairs[x]->elementB->value);
                             }
                         }
                         if(nalezeno == 0)
@@ -1065,7 +1167,6 @@ void function(Command *com)
     }
 
     Relation *rel = com->rel;
-    Set *universe = com->universe;
 
     int chyba = 0;
 
@@ -1175,52 +1276,25 @@ void codomain(Command *com)
 /*
 injective R - tiskne true nebo false, jestli je funkce R injektivní.
 */
-void injective(Command *rel)
+void injective(Command *com)
 {
-    //TODO
-   /* printf("injective \n");
-    printf("relation :\n");
-    printRelation(rel);
-    printf("first set");
-    printSet(set1);
-    printf("second set");
-    printSet(set2);
-    printf("universe:\n");
-    printSet(universe); */
+   // printRelation(com->rel);
 }
 
 /*
 surjective R - tiskne true nebo false, jestli je funkce R surjektivní.
 */
-void surjective(Command *rel)
+void surjective(Command *com)
 {
-    //TODO
-    /* printf("surjective \n");
-    printf("relation :\n");
-    printRelation(rel);
-    printf("first set");
-    printSet(set1);
-    printf("second set");
-    printSet(set2);
-    printf("universe:\n");
-    printSet(universe);*/
+    //printRelation(com->rel);
 }
 
 /*
 bijective R - tiskne true nebo false, jestli je funkce R bijektivní.
 */
-void bijective(Command *rel)
+void bijective(Command *com)
 {
-    //TODO
-   /* printf("bijective \n");
-    printf("relation :\n");
-    printRelation(rel);
-    printf("first set");
-    printSet(set1);
-    printf("second set");
-    printSet(set2);
-    printf("universe:\n");
-    printSet(universe);*/
+   // printRelation(com->rel);
 }
 
 //Advanced commmands
@@ -1228,64 +1302,39 @@ void bijective(Command *rel)
 /*
 closure_ref R - tiskne reflexivní uzávìr relace R
 */
-void closureRef(Command *rel)
+void closureRef(Command *com)
 {
-    //TODO
-   /* printf("closureRef \n");
-    printf("relation :\n");
-    printRelation(rel);
-    printf("universe:\n");
-    printSet(universe);*/
+      //  printRelation(com->rel);
 }
 
 /*
 closure_sym R - tiskne symetrický uzávìr relace R
 */
-void closureSym(Command *rel)
+void closureSym(Command *com)
 {
-    //TODO
-    /*printf("closureSym \n");
-    printf("relation :\n");
-    printRelation(rel);
-    printf("universe:\n");
-    printSet(universe);*/
+      //  printRelation(com->rel);
 }
 
 /*
 closure_trans R - tiskne tranzitivní uzávìr relace R
 */
-void closureTrans(Command *rel)
+void closureTrans(Command *com)
 {
-    //TODO
-    /*printf("closureTrans \n");
-    printf("relation :\n");
-    printRelation(rel);
-    printf("universe:\n");
-    printSet(universe);*/
+       // printRelation(com->rel);
 }
 
 //-- Bonus --
 /*
 select A N - vybere náhodný prvek z množiny nebo relace A a tiskne ho. V pøípadì, že je množina A prázdná, pøeskoèí vykonávání pøíkazu na øádek N vstupního souboru. N v takovém pøípadì musí oznaèovat existující øádek ve vstupním souboru.
 */
-void selectFromRelation(Command *rel)
+void selectFromRelation(Command *com)
 {
-    //TODO
-    /*printf("selectFromRelation \n");
-    printf("relation :\n");
-    printRelation(rel);
-    printf("universe:\n");
-    printSet(universe);*/
+     //   printRelation(com->rel);
 }
 
-void selectFromSet(Command *set)
+void selectFromSet(Command *com)
 {
-    //TODO
-     /*printf("selectFromSet \n");
-    printf("mnozina :\n");
-    printSet(set);
-    printf("universe:\n");
-    printSet(universe);*/
+    //    printSet(com->setA);
 }
 
 // Arguments
@@ -1296,11 +1345,11 @@ Rozšíøení všech pøíkazù, které tisknou true nebo false o další argume
 //-- Bonus --
 
 //Command functions
-void functionLookup(Function* functions, Command *com, Data *data)
+void functionLookup(Function* functions, Command *com)
 {
     for(int i = 0; i < FUNCTION_COUNT; i++){
         Function function = functions[i];
-        if(!strcmp(function.name, com->functionName)){
+        if(!strcmp(function.name, com->data[0].value)){
             function.func(com);
             return;
         }
@@ -1401,7 +1450,7 @@ int main(int argc, char *argv[])
 
     Function functions[FUNCTION_COUNT];
 
-    initFunctions(&functions);
+    initFunctions(functions);
 
     FILE *file = fopen(fileName, "r");
 
@@ -1413,32 +1462,32 @@ int main(int argc, char *argv[])
 
     loadUniverse(data, file);
 
-    if(isUniverseValid(&initFunctions, data->universe)){
+    if(!isUniverseValid(functions, data->universe)){
         fprintf(stderr, "Universe is not valid");
         return 1;
     }
 
-    loadFileData(file, data);
-
     printUniverse(data->universe);
+
+    loadFileData(file, data);
 
     for (int i = 1; i < data->size; i++)
     {
         Row *row = &data->rows[i];
-        if (row->set != NULL)
+
+        if(row->command != NULL){
+            Command *command = row->command;
+            finishCommand(command, data);
+            functionLookup(functions, command);
+        }else if (row->set != NULL)
         {
-            if(row->command){
-                Command *command = parseSetToCommand(row->set, data);
-                functionLookup(&functions, command, data);
-                free(command);
-            }else{
-                printSet(row->set);
-            }
+            printSet(row->set);
         }else if(row->relation != NULL)
         {
             printRelation(row->relation);
         }else{
             fprintf(stderr, "Invalid row");
+            printf("%d \n", i);
             return 1;
         }
     }
