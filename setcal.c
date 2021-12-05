@@ -9,17 +9,21 @@
 #include <string.h>
 #include <stdbool.h>
 
-//Default constants
+//--Default constants--
+//max rows in a file
 #define MAX_ROWS 1000
+//maximum number of characters in an element
 #define MAX_ELEMENT_LENGTH 30
+//Number of initial allocated elements
 #define DEFAULT_ELEMENT_ARRAY_LENGHT 10
+//Max lenght of an function name
 #define MAX_FUNCTION_NAME_LENGTH 100
+//Number of functions in a program
+#define FUNCTION_COUNT 18
+//Number of possible arguments in a command
+#define COMMAND_ARG_SIZE 4
 
-//function counts
-#define FUNCTION_COUNT 25
-
-#define COMMAND_SIZE 4
-
+//Char constants
 #define LARGEST_C_LETTER_CHAR 'Z'
 #define SMALLEST_C_LETTER_CHAR 'A'
 
@@ -50,14 +54,14 @@ typedef struct
     Element *elementB;
 } Pair;
 
-//Relation of pairs
+//Relation as an array of pairs
 typedef struct
 {
     int size;
     Pair **pairs;
 } Relation;
 
-//Command struct for activating functions
+//Command struct for activating functions and providing with variables
 typedef struct
 {
     int count;
@@ -65,11 +69,11 @@ typedef struct
     Set *setB;
     Relation *rel;
     Set* universe;
-    Element data[COMMAND_SIZE];
+    Element data[COMMAND_ARG_SIZE];
 } Command;
 
 //Row of an file
-//Contains set or relation or set for an command
+//Contains set, relation or an command
 typedef struct
 {
     Set *set;
@@ -77,7 +81,7 @@ typedef struct
     Command *command;
 } Row;
 
-//Rows from a file.
+//Parsed rows from a file.
 typedef struct
 {
     int size;
@@ -85,14 +89,21 @@ typedef struct
     Row rows[MAX_ROWS + 1];
 } Data;
 
-//--Function structs--
+//Struct containing a name of an function and a pointer to that function.
 typedef struct
 {
     char name[MAX_FUNCTION_NAME_LENGTH];
     void (*func)(Command*);
 } Function;
 
-// --Init functions--
+// --Initializers/Constructors--
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
 Element *initElement()
 {
     Element *element = malloc(sizeof(Element));
@@ -101,6 +112,13 @@ Element *initElement()
     return element;
 }
 
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
 Set *initSet(int size)
 {
     Set *set = malloc(sizeof(Set));
@@ -110,6 +128,13 @@ Set *initSet(int size)
     return set;
 }
 
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
 Relation *initRelation()
 {
     Relation *relation = malloc(sizeof(Relation));
@@ -119,6 +144,13 @@ Relation *initRelation()
     return relation;
 }
 
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
 Pair *initPair(Relation *relation)
 {
     Pair *pair = malloc(sizeof(Pair));
@@ -131,6 +163,13 @@ Pair *initPair(Relation *relation)
     return pair;
 }
 
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
 Data *initData()
 {
     Data *data = malloc(sizeof(Data));
@@ -138,6 +177,13 @@ Data *initData()
     return data;
 }
 
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
 Command *initCommand()
 {
     Command *command = malloc(sizeof(Command));
@@ -148,51 +194,33 @@ Command *initCommand()
     command->universe = NULL;
     command->count = 0;
 
-    for(int i = 0; i < COMMAND_SIZE; i ++){
+    for(int i = 0; i < COMMAND_ARG_SIZE; i ++){
         command->data[i].lenght = 0;
     }
 
     return command;
 }
 
-// --Free functions--
-bool isInSet(char* value, Set* set){
-    for (int i = 0; i < set->size; i++)
-    {
-        if (!strcmp(value, set->elements[i]->value))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool isPairInRelation(Pair* pair, Relation* rel){
-    for (int i = 0; i < rel->size; i++)
-    {
-        if (!strcmp(pair->elementA->value, rel->pairs[i]->elementA->value) &&
-            !strcmp(pair->elementB->value, rel->pairs[i]->elementB->value))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-void printElements(Element** elements, int size){
-    for (int x = 0; x < size; x++)
-    {
-        printf(" %s", elements[x]->value);
-    }
-}
-
+// --Destructors--
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
 void freeElement(Element *element)
 {
     free(element);
 }
 
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
 void freePair(Pair *pair)
 {
     freeElement(pair->elementA);
@@ -200,6 +228,13 @@ void freePair(Pair *pair)
     free(pair);
 }
 
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
 void freeReleation(Relation *relation)
 {
     for (int i = 0; i < relation->size; i++)
@@ -210,6 +245,13 @@ void freeReleation(Relation *relation)
     free(relation);
 }
 
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
 void freeSet(Set *set)
 {
     for (int i = 0; i < set->size; i++)
@@ -220,6 +262,13 @@ void freeSet(Set *set)
     free(set);
 }
 
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
 void freeData(Data *data)
 {
     for (int i = 0; i < data->size; i++)
@@ -242,23 +291,29 @@ void freeData(Data *data)
     free(data);
 }
 
-// --Util functions--
-
-void finishElement(Element *element)
-{
-    if (element->lenght < MAX_ELEMENT_LENGTH)
+// --Print functions--
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
+void printElements(Element** elements, int size){
+    for (int x = 0; x < size; x++)
     {
-        element->value[element->lenght + 1] = '\0';
+        printf(" %s", elements[x]->value);
     }
 }
 
+// --Util functions--
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
-  * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
- */
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
 bool isCharInRange(char ch, int minChar, int maxChar)
 {
     return ch >= minChar && ch <= maxChar;
@@ -318,6 +373,128 @@ bool isPositiveNumber(char *string)
     return true;
 }
 
+bool isInSet(char* value, Set* set){
+    for (int i = 0; i < set->size; i++)
+    {
+        if (!strcmp(value, set->elements[i]->value))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool isPairInRelation(Pair* pair, Relation* rel){
+    for (int i = 0; i < rel->size; i++)
+    {
+        if (!strcmp(pair->elementA->value, rel->pairs[i]->elementA->value) &&
+            !strcmp(pair->elementB->value, rel->pairs[i]->elementB->value))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool isSetValid(Set* set, Set* universe){
+    for (int i = 0; i < set->size; i++)
+    {
+        bool found = isInSet(set->elements[i]->value, universe);
+
+        if(!found){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool isUniverseValid(Function* functions, Set* set){
+
+    if(isInSet("true", set) || isInSet("false", set))
+    {
+        return false;
+    }
+
+    for (int i = 0; i < FUNCTION_COUNT; i++)
+    {
+        if(isInSet(functions[i].name, set)){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+void checkRelation(Relation* relation, Set* universe){
+    for(int i = 0; i < relation->size; i++){
+        Pair* pair = relation->pairs[i];
+        if(!isInSet(pair->elementA->value, universe) || !isInSet(pair->elementB->value, universe) ){
+            fprintf(stderr, "Element of a relation is not in universe.\n");
+            exit(1);
+        }
+    }
+}
+
+void checkSet(Set* set, Set* universe){
+    for(int i = 0; i < set->size; i++){
+        Element* element = set->elements[i];
+        if(!isInSet(element->value, universe)){
+            fprintf(stderr, "Element %s of a set is not in universe.\n", element->value);
+            exit(1);
+        }
+    }
+}
+
+bool isBiCommand(Command* command){
+    return command->setA != NULL && command->setB != NULL && command->universe != NULL;
+}
+
+Set* getUnSet(Command* command){
+    if(command->universe != NULL){
+        if(command->setA != NULL){
+            return command->setA;
+        }else if(command->setB != NULL){
+            return command->setB;
+        }
+    }
+    return NULL;
+}
+
+bool isRelCommand(Command* command){
+    return command->rel != NULL && command->universe != NULL;
+}
+
+void exitFunction(){
+    fprintf(stderr, "Function arguments do not meet requirements.\n");
+    exit(1);
+}
+
+void checkArguments(Command* com, int count){
+    if(com->count - 1 > count){
+        exitFunction();
+    }
+}
+
+// --Final functions--
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
+void finishElement(Element *element)
+{
+    if (element->lenght < MAX_ELEMENT_LENGTH)
+    {
+        element->value[element->lenght + 1] = '\0';
+    }
+}
+
 void addRowToCommand(Command *command, Row *row)
 {
     if (row->relation == NULL)
@@ -351,6 +528,14 @@ Row *getRow(Data *data, char *value)
     return NULL;
 }
 
+
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
 void finishCommand(Command* command, Data* data){
     Element* element = &command->data[command->count];
 
@@ -373,58 +558,26 @@ void finishCommand(Command* command, Data* data){
     }
 }
 
-void parseToCommand(Command* command, char c)
-{
-
-    if(command->count >= COMMAND_SIZE){
-        fprintf(stderr, "Too many arguments.\n");
-        exit(1);
-    }
-
-    Element *element = &command->data[command->count];
-
-    if(c == ' '){
-        if(element->lenght > 0){
-            finishElement(element);
-            command->count ++;
-        }
-    }else{
-        element->value[element->lenght] = c;
-        element->lenght++;
-    }
-}
-
-void addSetElement(Set *set, Element *element)
-{
-    if(isInSet(element->value, set)){
-        fprintf(stderr, "Element %s already in set. \n", element->value);
-        exit(1);
-    }
-
-    set->elements[set->size] = element;
-    set->size++;
-
-    if (set->size > 0 && set->size % DEFAULT_ELEMENT_ARRAY_LENGHT)
-    {
-        Element** elements = (Element **)realloc(set->elements, sizeof(Element *) * set->size + sizeof(Element *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
-
-        if(elements != NULL){
-            set->elements = elements;
-        }else{
-            fprintf(stderr, "Could not allocate more memory for a set");
-            exit(1);
-        }
-    }
-
-    set->elements[set->size] = initElement();
-}
-
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
 void finishPair(Pair *pair)
 {
     finishElement(pair->elementA);
     finishElement(pair->elementB);
 }
 
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
 void finishLastPair(Relation *relation)
 {
 
@@ -453,6 +606,65 @@ void finishLastPair(Relation *relation)
     relation->pairs[relation->size] = NULL;
 }
 
+// --Parsing functions--
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
+void parseToCommand(Command* command, char c)
+{
+    if(command->count >= COMMAND_ARG_SIZE){
+        fprintf(stderr, "Too many arguments.\n");
+        exit(1);
+    }
+
+    Element *element = &command->data[command->count];
+
+    if(c == ' '){
+        if(element->lenght > 0){
+            finishElement(element);
+            command->count ++;
+        }
+    }else{
+        element->value[element->lenght] = c;
+        element->lenght++;
+    }
+}
+
+/**
+* Check if a character is in range of ASCII values
+* @param {char} ch - character to check
+* @param {int} minChar - lowest ASCII value
+* @param {int} maxChar - highest ASCII value
+* @returns {bool} true if character is in range of values
+*/
+void addSetElement(Set *set, Element *element)
+{
+    if(isInSet(element->value, set)){
+        fprintf(stderr, "Element %s already in set. \n", element->value);
+        exit(1);
+    }
+
+    set->elements[set->size] = element;
+    set->size++;
+
+    if (set->size > 0 && set->size % DEFAULT_ELEMENT_ARRAY_LENGHT)
+    {
+        Element** elements = (Element **)realloc(set->elements, sizeof(Element *) * set->size + sizeof(Element *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+
+        if(elements != NULL){
+            set->elements = elements;
+        }else{
+            fprintf(stderr, "Could not allocate more memory for a set");
+            exit(1);
+        }
+    }
+
+    set->elements[set->size] = initElement();
+}
 void addCharToElement(Element* element, char c){
     if(element->lenght < MAX_ELEMENT_LENGTH){
         if(isCharCapitalLetter(c) || isCharLetter(c)){
@@ -550,36 +762,6 @@ void parseToRelation(Relation *relation, char c)
     }
 }
 
-bool isSetValid(Set* set, Set* universe){
-    for (int i = 0; i < set->size; i++)
-    {
-        bool found = isInSet(set->elements[i]->value, universe);
-
-        if(!found){
-            return false;
-        }
-    }
-
-    return true;
-}
-
-bool isUniverseValid(Function* functions, Set* set){
-
-    if(isInSet("true", set) || isInSet("false", set))
-    {
-        return false;
-    }
-
-    for (int i = 0; i < FUNCTION_COUNT; i++)
-    {
-        if(isInSet(functions[i].name, set)){
-            return false;
-        }
-    }
-
-    return true;
-}
-
 // --Data processing--
 void loadUniverse(Data* data, FILE* file){
     char c = getc(file);
@@ -598,26 +780,6 @@ void loadUniverse(Data* data, FILE* file){
     }else{
         fprintf(stderr, "Universe not found.\n");
         exit(1);
-    }
-}
-
-void checkRelation(Relation* relation, Set* universe){
-    for(int i = 0; i < relation->size; i++){
-        Pair* pair = relation->pairs[i];
-        if(!isInSet(pair->elementA->value, universe) || !isInSet(pair->elementB->value, universe) ){
-            fprintf(stderr, "Element of a relation is not in universe.\n");
-            exit(1);
-        }
-    }
-}
-
-void checkSet(Set* set, Set* universe){
-    for(int i = 0; i < set->size; i++){
-        Element* element = set->elements[i];
-        if(!isInSet(element->value, universe)){
-            fprintf(stderr, "Element %s of a set is not in universe.\n", element->value);
-            exit(1);
-        }
     }
 }
 
@@ -757,37 +919,6 @@ void printRelation(Relation *relation)
 }
 
 // --Set functions--
-
-bool isBiCommand(Command* command){
-    return command->setA != NULL && command->setB != NULL && command->universe != NULL;
-}
-
-Set* getUnSet(Command* command){
-    if(command->universe != NULL){
-        if(command->setA != NULL){
-            return command->setA;
-        }else if(command->setB != NULL){
-            return command->setB;
-        }
-    }
-    return NULL;
-}
-
-bool isRelCommand(Command* command){
-    return command->rel != NULL && command->universe != NULL;
-}
-
-void exitFunction(){
-    fprintf(stderr, "Function arguments do not meet requirements.\n");
-    exit(1);
-}
-
-void checkArguments(Command* com, int count){
-    if(com->count - 1 > count){
-        exitFunction();
-    }
-}
-
 /*
 empty A - tiskne true nebo false podle toho, jestli je množina definovaná na øádku A prázdná nebo neprázdná.
 */
@@ -1064,7 +1195,7 @@ void reflexive(Command *com)
     //zjistim, zda je vice rel nez universe
     if(rel->size < universe->size)
     {
-        printf("false\n");
+        printBool(false);
     }
     else
     {
@@ -1400,65 +1531,6 @@ void bijective(Command *com)
    // printRelation(com->rel);
 }
 
-//Advanced commmands
-
-/*
-closure_ref R - tiskne reflexivní uzávìr relace R
-*/
-void closureRef(Command *com)
-{
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
-    }
-      //  printRelation(com->rel);
-}
-
-/*
-closure_sym R - tiskne symetrický uzávìr relace R
-*/
-void closureSym(Command *com)
-{
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
-    }
-      //  printRelation(com->rel);
-}
-
-/*
-closure_trans R - tiskne tranzitivní uzávìr relace R
-*/
-void closureTrans(Command *com)
-{
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
-    }
-       // printRelation(com->rel);
-}
-
-//-- Bonus --
-/*
-select A N - vybere náhodný prvek z množiny nebo relace A a tiskne ho. V pøípadì, že je množina A prázdná, pøeskoèí vykonávání pøíkazu na øádek N vstupního souboru. N v takovém pøípadì musí oznaèovat existující øádek ve vstupním souboru.
-*/
-void selectFromRelation(Command *com)
-{
-    checkArguments(com, 1);
-     //   printRelation(com->rel);
-}
-
-void selectFromSet(Command *com)
-{
-    //    printSet(com->setA);
-}
-
-// Arguments
-/*
-Rozšíøení všech pøíkazù, jejichž výsledkem je množina nebo relace, definuje novou množinu nebo relaci identifikovanou èíslem øádku, na kterém se nachází daná operace.
-Rozšíøení všech pøíkazù, které tisknou true nebo false o další argument N. V pøípadì, že operace konèí s výsledkem false, následující øádek, který se zpracovává, bude na øádku N (nikoliv bezprostøednì následující).
-*/
-//-- Bonus --
-
 //Command functions
 void functionLookup(Function* functions, Command *com)
 {
@@ -1486,71 +1558,55 @@ void initFunctions(Function* functions)
     strcpy(functions[2].name, "complement");
     functions[2].func = complement;
 
-    strcpy(functions[3].name, "select");
-    functions[3].func = selectFromSet;
-
     //binsetfun
-    strcpy(functions[4].name, "union");
-    functions[4].func = setUnion;
+    strcpy(functions[3].name, "union");
+    functions[3].func = setUnion;
 
-    strcpy(functions[5].name, "intersect");
-    functions[5].func = intersect;
+    strcpy(functions[4].name, "intersect");
+    functions[4].func = intersect;
 
-    strcpy(functions[6].name, "minus");
-    functions[6].func = minus;
+    strcpy(functions[5].name, "minus");
+    functions[5].func = minus;
 
-    strcpy(functions[7].name, "subseteq");
-    functions[7].func = subseteq;
+    strcpy(functions[6].name, "subseteq");
+    functions[6].func = subseteq;
 
-    strcpy(functions[8].name, "subset");
-    functions[8].func = subset;
+    strcpy(functions[7].name, "subset");
+    functions[7].func = subset;
 
-    strcpy(functions[9].name, "equals");
-    functions[9].func = equals;
+    strcpy(functions[8].name, "equals");
+    functions[8].func = equals;
 
          //unRelFunMap
-    strcpy(functions[10].name, "reflexive");
-     functions[10].func = reflexive;
+    strcpy(functions[9].name, "reflexive");
+     functions[9].func = reflexive;
 
-     strcpy(functions[11].name, "symmetric");
-     functions[11].func = symmetric;
+     strcpy(functions[10].name, "symmetric");
+     functions[10].func = symmetric;
 
-     strcpy(functions[12].name, "antisymmetric");
-     functions[12].func = antisymmetric;
+     strcpy(functions[11].name, "antisymmetric");
+     functions[11].func = antisymmetric;
 
-     strcpy(functions[13].name, "transitive");
-     functions[13].func = transitive;
+     strcpy(functions[12].name, "transitive");
+     functions[12].func = transitive;
 
-     strcpy(functions[14].name, "function");
-     functions[14].func = function;
+     strcpy(functions[13].name, "function");
+     functions[13].func = function;
 
-     strcpy(functions[15].name, "domain");
-     functions[15].func = domain;
+     strcpy(functions[14].name, "domain");
+     functions[14].func = domain;
 
-    strcpy(functions[16].name, "codomain");
-    functions[16].func = codomain;
+    strcpy(functions[15].name, "codomain");
+    functions[15].func = codomain;
 
-    strcpy(functions[17].name, "closureRef");
-    functions[17].func = closureRef;
+    strcpy(functions[16].name, "injective");
+    functions[16].func = injective;
 
-    strcpy(functions[18].name, "closureSym");
-   functions[18].func = closureSym;
+     strcpy(functions[17].name, "surjective");
+     functions[17].func = surjective;
 
-    strcpy(functions[19].name, "closureTrans");
-    functions[19].func = closureTrans;
-
-     strcpy(functions[20].name, "selectFromRelation");
-    functions[20].func = selectFromRelation;
-
-         //triRelFunMap
-    strcpy(functions[21].name, "injective");
-    functions[21].func = injective;
-
-     strcpy(functions[22].name, "surjective");
-     functions[22].func = surjective;
-
-    strcpy(functions[23].name, "bijective");
-    functions[23].func = bijective;
+    strcpy(functions[18].name, "bijective");
+    functions[18].func = bijective;
 }
 
 int main(int argc, char *argv[])
