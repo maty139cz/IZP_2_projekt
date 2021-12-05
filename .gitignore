@@ -64,3 +64,5 @@ Makefile
 test.txt
 tests-izp-projekt-2-master
 tests-izp-projekt-2-master.zip
+tests-izp-projekt-2-master/*
+injective.txt

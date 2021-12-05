@@ -344,8 +344,7 @@ bool isCharCapitalLetter(char ch)
 }
 
 /**
- * Uses isCharInRange function
- * Range is set between lowest and highest letters ASCII characters
+ * @brief Uses isCharInRange function Range is set between lowest and highest letters ASCII characters
  * @param {char} ch - character to check
  * @returns {bool} true if character is in range of ASCII letters
  */
@@ -367,7 +366,8 @@ bool isCharNumber(char ch)
 
 /**
  * Checks if string is a number
- * @param {char*} Pointer to a string;
+ * @param {char*} Pointer to a string
+ * @return {bool} true if string is a number
  */
 bool isPositiveNumber(char *string)
 {
@@ -384,7 +384,14 @@ bool isPositiveNumber(char *string)
     }
     return true;
 }
-
+/**
+ * @brief checks if the given value is in the given set 
+ * 
+ * @param value the value that is sought  
+ * @param set the checked set 
+ * @return true if the value is found 
+ * @return false if the value is not found
+ */
 bool isInSet(char *value, Set *set)
 {
     for (int i = 0; i < set->size; i++)
@@ -397,7 +404,14 @@ bool isInSet(char *value, Set *set)
 
     return false;
 }
-
+/**
+ * @brief checks if given pair is in a relation 
+ * 
+ * @param pair the pair that is sought 
+ * @param rel the check relation 
+ * @return true if the pair is found 
+ * @return false if the pair is not found 
+ */
 bool isPairInRelation(Pair *pair, Relation *rel)
 {
     for (int i = 0; i < rel->size; i++)
@@ -411,7 +425,14 @@ bool isPairInRelation(Pair *pair, Relation *rel)
 
     return false;
 }
-
+/**
+ * @brief check if all elements in all pairs belong to the given set  
+ * 
+ * @param relation the relation that is checked 
+ * @param universe the set that we check against 
+ * @return true if all elements belong to the universe   
+ * @return false if all elements do not belong to the universe  
+ */
 bool isRelationValid(Relation *relation, Set *universe)
 {
 
@@ -427,7 +448,14 @@ bool isRelationValid(Relation *relation, Set *universe)
 
     return true;
 }
-
+/**
+ * @brief check if all elements in a set belong to the given set  
+ * 
+ * @param set the checked set 
+ * @param universe the set that we check against 
+ * @return true if all elements belong to the universe   
+ * @return false if all elements do not belong to the universe  
+ */
 bool isSetValid(Set *set, Set *universe)
 {
     for (int i = 0; i < set->size; i++)
@@ -441,7 +469,14 @@ bool isSetValid(Set *set, Set *universe)
     }
     return true;
 }
-
+/**
+ * @brief check if the given set does not contain prohibited values such as names of functions, true and false  
+ * 
+ * @param functions struct of functions 
+ * @param set the checked set 
+ * @return true if prohibited values were found 
+ * @return false if prohibited values were not found 
+ */
 bool isUniverseValid(Function *functions, Set *set)
 {
 
@@ -460,12 +495,23 @@ bool isUniverseValid(Function *functions, Set *set)
 
     return true;
 }
-
+/**
+ * @brief check if the given command has two sets given 
+ * 
+ * @param command checked command 
+ * @return true if it does have two sets given 
+ * @return false if it does not have two sets given 
+ */
 bool isBiCommand(Command *command)
 {
     return command->setA != NULL && command->setB != NULL && command->universe != NULL;
 }
-
+/**
+ * @brief return a set from unary command 
+ * 
+ * @param command the given command 
+ * @return Set* pointer to the set in the command 
+ */
 Set *getUnSet(Command *command)
 {
     if (command->universe != NULL)
@@ -481,7 +527,13 @@ Set *getUnSet(Command *command)
     }
     return NULL;
 }
-
+/**
+ * @brief check if the given command has a relation registered 
+ * 
+ * @param command the given command 
+ * @return true if the command has a relation given 
+ * @return false if the command has no relation given 
+ */
 bool isRelCommand(Command *command)
 {
     return command->rel != NULL && command->universe != NULL;
@@ -489,11 +541,19 @@ bool isRelCommand(Command *command)
 
 // --Final functions--
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief Check if a character is in range of ASCII values
+ * 
+ * @param  ch  character to check
+ * @param minChar - lowest ASCII value
+ * @param  maxChar - highest ASCII value
+ * @return  true if character is in range of values
+ * @return fase if character is not in range 
+ */
+
+/**
+ * @brief null terminates the string in the given element 
+ * 
+ * @param element the given element 
  */
 void finishElement(Element *element)
 {
@@ -502,7 +562,12 @@ void finishElement(Element *element)
         element->value[element->lenght + 1] = '\0';
     }
 }
-
+/**
+ * @brief adds data row to command 
+ * 
+ * @param command the command to apend row to 
+ * @param row the row that is apended 
+ */
 void addRowToCommand(Command *command, Row *row)
 {
     if (row->relation == NULL)
@@ -521,7 +586,13 @@ void addRowToCommand(Command *command, Row *row)
         command->rel = row->relation;
     }
 }
-
+/**
+ * @brief Get the Row form the data array based on position 
+ * 
+ * @param data the data array form witch we want to get he row extracted 
+ * @param value the index of the row 
+ * @return Row* pointer to the desired row 
+ */
 Row *getRow(Data *data, char *value)
 {
     if (isPositiveNumber(value))
@@ -1592,8 +1663,8 @@ void injective(Command *com)
         return;
     }
  Relation *rel = com->rel;
-    Set *setA=com->setA;
-    Set *setB=com->setB;
+   // Set *setA=com->setA;
+    //Set *setB=com->setB;
 
     //fun start 
   int ok = 1;
@@ -1606,7 +1677,7 @@ void injective(Command *com)
             {
                 if(strcoll(rel->pairs[i]->elementA->value, rel->pairs[y]->elementA->value) == 0)
                 {
-                    ok = 0; //konec
+                    ok = 0; //end
                 }
             }
         }
@@ -1627,8 +1698,8 @@ void surjective(Command *com)
         return;
     }
    Relation *rel = com->rel;
-    Set *setA=com->setA;
-    Set *setB=com->setB;
+   // Set *setA=com->setA;
+    //Set *setB=com->setB;
     //fun start 
      int ok = 1;
 
@@ -1640,7 +1711,7 @@ void surjective(Command *com)
             {
                 if(strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementB->value) == 0)
                 {
-                    ok = 0; //konec
+                    ok = 0; //end
                 }
             }
         }
@@ -1659,8 +1730,8 @@ void bijective(Command *com)
         return;
     }
     Relation *rel = com->rel;
-    Set *setA=com->setA;
-    Set *setB=com->setB;
+   // Set *setA=com->setA;
+    //Set *setB=com->setB;
     //fun start 
    int ok = 1;
 
@@ -1672,12 +1743,12 @@ void bijective(Command *com)
             {
                 if(strcoll(rel->pairs[i]->elementA->value, rel->pairs[y]->elementA->value) == 0)
                 {
-                    ok = 0; //konec
+                    ok = 0; //end
                 }
                 
                 if(strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementB->value) == 0)
                 {
-                    ok = 0; //konec
+                    ok = 0; //end
                 }
             }
         }
