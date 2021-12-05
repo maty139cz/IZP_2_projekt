@@ -1584,13 +1584,41 @@ injective R - tiskne true nebo false, jestli je funkce R injektivní.
 */
 void injective(Command *com)
 {
+<<<<<<< Updated upstream
     if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
     {
         com->success = false;
         return;
+=======
+    checkArguments(com, 3);
+    if(!isRelCommand(com) || isBiCommand(com)){
+        exitFunction();
+>>>>>>> Stashed changes
+    }
+    Relation *rel=com->rel;
+
+
+  int ok = 1;
+
+<<<<<<< Updated upstream
+    // printRelation(com->rel);
+=======
+    for(int i = 0; i < rel->size; i++)
+    {
+        for(int y = 0; y < rel->size; y++)
+        {
+            if(i != y)
+            {
+                if(strcoll(rel->pairs[i]->elementA->value, rel->pairs[y]->elementA->value) == 0)
+                {
+                    ok = 0; //konec
+                }
+            }
+        }
     }
 
-    // printRelation(com->rel);
+    printBool(ok==1);
+>>>>>>> Stashed changes
 }
 
 /*
@@ -1598,12 +1626,36 @@ surjective R - tiskne true nebo false, jestli je funkce R surjektivní.
 */
 void surjective(Command *com)
 {
+<<<<<<< Updated upstream
     if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
     {
         com->success = false;
         return;
     }
     // printRelation(com->rel);
+=======
+    checkArguments(com, 3);
+    if(!isRelCommand(com) || isBiCommand(com)){
+        exitFunction();
+    }
+    Relation *rel = com->rel;
+     int ok = 1;
+
+    for(int i = 0; i < rel->size; i++)
+    {
+        for(int y = 0; y < rel->size; y++)
+        {
+            if(i != y)
+            {
+                if(strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementB->value) == 0)
+                {
+                    ok = 0; //konec
+                }
+            }
+        }
+    }
+    printBool(ok==1);
+>>>>>>> Stashed changes
 }
 
 /*
@@ -1611,12 +1663,93 @@ bijective R - tiskne true nebo false, jestli je funkce R bijektivní.
 */
 void bijective(Command *com)
 {
+<<<<<<< Updated upstream
     if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
     {
         com->success = false;
         return;
     }
     // printRelation(com->rel);
+=======
+    checkArguments(com, 3);
+    if(!isRelCommand(com) || isBiCommand(com)){
+        exitFunction();
+    }
+    Relation *rel = com->rel;
+   int ok = 1;
+
+    for(int i = 0; i < rel->size; i++)
+    {
+        for(int y = 0; y < rel->size; y++)
+        {
+            if(i != y)
+            {
+                if(strcoll(rel->pairs[i]->elementA->value, rel->pairs[y]->elementA->value) == 0)
+                {
+                    ok = 0; //konec
+                }
+                
+                if(strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementB->value) == 0)
+                {
+                    ok = 0; //konec
+                }
+            }
+        }
+    }
+    printBool(ok==1);
+}
+
+//Advanced commmands
+
+/*
+closure_ref R - tiskne reflexivní uzávìr relace R
+*/
+void closureRef(Command *com)
+{
+    checkArguments(com, 1);
+    if(!isRelCommand(com) || isBiCommand(com)){
+        exitFunction();
+    }
+      //  printRelation(com->rel);
+}
+
+/*
+closure_sym R - tiskne symetrický uzávìr relace R
+*/
+void closureSym(Command *com)
+{
+    checkArguments(com, 1);
+    if(!isRelCommand(com) || isBiCommand(com)){
+        exitFunction();
+    }
+      //  printRelation(com->rel);
+}
+
+/*
+closure_trans R - tiskne tranzitivní uzávìr relace R
+*/
+void closureTrans(Command *com)
+{
+    if(!isRelCommand(com) || isBiCommand(com)){
+        exitFunction();
+    }
+       // printRelation(com->rel);
+}
+
+//-- Bonus --
+/*
+select A N - vybere náhodný prvek z množiny nebo relace A a tiskne ho. V pøípadì, že je množina A prázdná, pøeskoèí vykonávání pøíkazu na øádek N vstupního souboru. N v takovém pøípadì musí oznaèovat existující øádek ve vstupním souboru.
+*/
+void selectFromRelation(Command *com)
+{
+    checkArguments(com, 1);
+     //   printRelation(com->rel);
+}
+
+void selectFromSet(Command *com)
+{
+   (void)com;
+>>>>>>> Stashed changes
 }
 
 // Command functions
