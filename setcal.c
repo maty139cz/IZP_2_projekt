@@ -3,23 +3,27 @@
  @name: setcal.c
 */
 
-//Basic libraries.
+// Basic libraries.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 
-//Default constants
+//--Default constants--
+// max rows in a file
 #define MAX_ROWS 1000
+// maximum number of characters in an element
 #define MAX_ELEMENT_LENGTH 30
+// Number of initial allocated elements
 #define DEFAULT_ELEMENT_ARRAY_LENGHT 10
+// Max lenght of an function name
 #define MAX_FUNCTION_NAME_LENGTH 100
+// Number of functions in a program
+#define FUNCTION_COUNT 18
+// Number of possible arguments in a command
+#define COMMAND_ARG_SIZE 4
 
-//function counts
-#define FUNCTION_COUNT 25
-
-#define COMMAND_SIZE 4
-
+// Char constants
 #define LARGEST_C_LETTER_CHAR 'Z'
 #define SMALLEST_C_LETTER_CHAR 'A'
 
@@ -29,47 +33,48 @@
 #define LARGEST_NUMBER_CHAR '9'
 #define SMALLEST_NUMBER_CHAR '0'
 
-//Elemental unit of an universe
+// Elemental unit of an universe
 typedef struct
 {
     int lenght;
     char value[MAX_ELEMENT_LENGTH + 1];
 } Element;
 
-//Set of elements
+// Set of elements
 typedef struct
 {
     int size;
     Element **elements;
 } Set;
 
-//Pair of two elements
+// Pair of two elements
 typedef struct
 {
     Element *elementA;
     Element *elementB;
 } Pair;
 
-//Relation of pairs
+// Relation as an array of pairs
 typedef struct
 {
     int size;
     Pair **pairs;
 } Relation;
 
-//Command struct for activating functions
+// Command struct for activating functions and providing with variables
 typedef struct
 {
     int count;
     Set *setA;
     Set *setB;
     Relation *rel;
-    Set* universe;
-    Element data[COMMAND_SIZE];
+    Set *universe;
+    bool success;
+    Element data[COMMAND_ARG_SIZE];
 } Command;
 
-//Row of an file
-//Contains set or relation or set for an command
+// Row of an file
+// Contains set, relation or an command
 typedef struct
 {
     Set *set;
@@ -77,22 +82,29 @@ typedef struct
     Command *command;
 } Row;
 
-//Rows from a file.
+// Parsed rows from a file.
 typedef struct
 {
     int size;
-    Set* universe;
+    Set *universe;
     Row rows[MAX_ROWS + 1];
 } Data;
 
-//--Function structs--
+// Struct containing a name of an function and a pointer to that function.
 typedef struct
 {
     char name[MAX_FUNCTION_NAME_LENGTH];
-    void (*func)(Command*);
+    void (*func)(Command *);
 } Function;
 
-// --Init functions--
+// --Initializers/Constructors--
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
 Element *initElement()
 {
     Element *element = malloc(sizeof(Element));
@@ -101,24 +113,45 @@ Element *initElement()
     return element;
 }
 
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
 Set *initSet(int size)
 {
     Set *set = malloc(sizeof(Set));
-    set->elements = (Element **)malloc(size * sizeof(Element*));
+    set->elements = (Element **)malloc(size * sizeof(Element *));
     set->size = 0;
     set->elements[0] = NULL;
     return set;
 }
 
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
 Relation *initRelation()
 {
     Relation *relation = malloc(sizeof(Relation));
-    relation->pairs = (Pair **) malloc(sizeof(Pair *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+    relation->pairs = (Pair **)malloc(sizeof(Pair *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
     relation->size = 0;
     relation->pairs[0] = NULL;
     return relation;
 }
 
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
 Pair *initPair(Relation *relation)
 {
     Pair *pair = malloc(sizeof(Pair));
@@ -131,6 +164,13 @@ Pair *initPair(Relation *relation)
     return pair;
 }
 
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
 Data *initData()
 {
     Data *data = malloc(sizeof(Data));
@@ -138,6 +178,13 @@ Data *initData()
     return data;
 }
 
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
 Command *initCommand()
 {
     Command *command = malloc(sizeof(Command));
@@ -147,52 +194,36 @@ Command *initCommand()
     command->rel = NULL;
     command->universe = NULL;
     command->count = 0;
+    command->success = true;
 
-    for(int i = 0; i < COMMAND_SIZE; i ++){
+    for (int i = 0; i < COMMAND_ARG_SIZE; i++)
+    {
         command->data[i].lenght = 0;
     }
 
     return command;
 }
 
-// --Free functions--
-bool isInSet(char* value, Set* set){
-    for (int i = 0; i < set->size; i++)
-    {
-        if (!strcmp(value, set->elements[i]->value))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool isPairInRelation(Pair* pair, Relation* rel){
-    for (int i = 0; i < rel->size; i++)
-    {
-        if (!strcmp(pair->elementA->value, rel->pairs[i]->elementA->value) &&
-            !strcmp(pair->elementB->value, rel->pairs[i]->elementB->value))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-void printElements(Element** elements, int size){
-    for (int x = 0; x < size; x++)
-    {
-        printf(" %s", elements[x]->value);
-    }
-}
-
+// --Destructors--
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
 void freeElement(Element *element)
 {
     free(element);
 }
 
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
 void freePair(Pair *pair)
 {
     freeElement(pair->elementA);
@@ -200,6 +231,13 @@ void freePair(Pair *pair)
     free(pair);
 }
 
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
 void freeReleation(Relation *relation)
 {
     for (int i = 0; i < relation->size; i++)
@@ -210,6 +248,13 @@ void freeReleation(Relation *relation)
     free(relation);
 }
 
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
 void freeSet(Set *set)
 {
     for (int i = 0; i < set->size; i++)
@@ -220,6 +265,13 @@ void freeSet(Set *set)
     free(set);
 }
 
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
 void freeData(Data *data)
 {
     for (int i = 0; i < data->size; i++)
@@ -234,7 +286,9 @@ void freeData(Data *data)
         if (row.set != NULL)
         {
             freeSet(row.set);
-        }else if(row.command != NULL){
+        }
+        else if (row.command != NULL)
+        {
             free(row.command);
         }
     }
@@ -242,21 +296,35 @@ void freeData(Data *data)
     free(data);
 }
 
-// --Util functions--
-
-void finishElement(Element *element)
+void safeExit(Data *data, FILE *file, int state)
 {
-    if (element->lenght < MAX_ELEMENT_LENGTH)
-    {
-        element->value[element->lenght + 1] = '\0';
-    }
+    freeData(data);
+    fclose(file);
+    exit(state);
 }
 
+// --Print functions--
 /**
  * Check if a character is in range of ASCII values
  * @param {char} ch - character to check
  * @param {int} minChar - lowest ASCII value
-  * @param {int} maxChar - highest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
+void printElements(Element **elements, int size)
+{
+    for (int x = 0; x < size; x++)
+    {
+        printf(" %s", elements[x]->value);
+    }
+}
+
+// --Util functions--
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
  * @returns {bool} true if character is in range of values
  */
 bool isCharInRange(char ch, int minChar, int maxChar)
@@ -286,7 +354,6 @@ bool isCharLetter(char ch)
     return isCharInRange(ch, SMALLEST_LETTER_CHAR, LARGEST_LETTER_CHAR);
 }
 
-
 /**
  * Uses isCharInRange function
  * Range is set between lowest and highest number ASCII characters
@@ -300,14 +367,14 @@ bool isCharNumber(char ch)
 
 /**
  * Checks if string is a number
-  * @param {char*} Pointer to a string;
+ * @param {char*} Pointer to a string;
  */
 bool isPositiveNumber(char *string)
 {
     int i = 0;
     while (string[i] != '\0')
     {
-        //if character contains non string, then the string is not a number
+        // if character contains non string, then the string is not a number
         if (!isCharNumber(string[i]))
         {
             fprintf(stderr, "Value is not positive number\n");
@@ -316,6 +383,124 @@ bool isPositiveNumber(char *string)
         i++;
     }
     return true;
+}
+
+bool isInSet(char *value, Set *set)
+{
+    for (int i = 0; i < set->size; i++)
+    {
+        if (!strcmp(value, set->elements[i]->value))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool isPairInRelation(Pair *pair, Relation *rel)
+{
+    for (int i = 0; i < rel->size; i++)
+    {
+        if (!strcmp(pair->elementA->value, rel->pairs[i]->elementA->value) &&
+            !strcmp(pair->elementB->value, rel->pairs[i]->elementB->value))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool isRelationValid(Relation *relation, Set *universe)
+{
+
+    for (int i = 0; i < relation->size; i++)
+    {
+        Pair *pair = relation->pairs[i];
+        if (!isInSet(pair->elementA->value, universe) || !isInSet(pair->elementB->value, universe))
+        {
+            fprintf(stderr, "Element of a relation is not in universe.\n");
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool isSetValid(Set *set, Set *universe)
+{
+    for (int i = 0; i < set->size; i++)
+    {
+        Element *element = set->elements[i];
+        if (!isInSet(element->value, universe))
+        {
+            fprintf(stderr, "Element of a set is not in universe.\n");
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isUniverseValid(Function *functions, Set *set)
+{
+
+    if (isInSet("true", set) || isInSet("false", set))
+    {
+        return false;
+    }
+
+    for (int i = 0; i < FUNCTION_COUNT; i++)
+    {
+        if (isInSet(functions[i].name, set))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool isBiCommand(Command *command)
+{
+    return command->setA != NULL && command->setB != NULL && command->universe != NULL;
+}
+
+Set *getUnSet(Command *command)
+{
+    if (command->universe != NULL)
+    {
+        if (command->setA != NULL)
+        {
+            return command->setA;
+        }
+        else if (command->setB != NULL)
+        {
+            return command->setB;
+        }
+    }
+    return NULL;
+}
+
+bool isRelCommand(Command *command)
+{
+    return command->rel != NULL && command->universe != NULL;
+}
+
+// --Final functions--
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
+void finishElement(Element *element)
+{
+    if (element->lenght < MAX_ELEMENT_LENGTH)
+    {
+        element->value[element->lenght + 1] = '\0';
+    }
 }
 
 void addRowToCommand(Command *command, Row *row)
@@ -351,10 +536,19 @@ Row *getRow(Data *data, char *value)
     return NULL;
 }
 
-void finishCommand(Command* command, Data* data){
-    Element* element = &command->data[command->count];
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
+void finishCommand(Command *command, Data *data)
+{
+    Element *element = &command->data[command->count];
 
-    if(element->lenght > 0){
+    if (element->lenght > 0)
+    {
         finishElement(element);
         command->count++;
     }
@@ -373,66 +567,35 @@ void finishCommand(Command* command, Data* data){
     }
 }
 
-void parseToCommand(Command* command, char c)
-{
-
-    if(command->count >= COMMAND_SIZE){
-        fprintf(stderr, "Too many arguments.\n");
-        exit(1);
-    }
-
-    Element *element = &command->data[command->count];
-
-    if(c == ' '){
-        if(element->lenght > 0){
-            finishElement(element);
-            command->count ++;
-        }
-    }else{
-        element->value[element->lenght] = c;
-        element->lenght++;
-    }
-}
-
-void addSetElement(Set *set, Element *element)
-{
-    if(isInSet(element->value, set)){
-        fprintf(stderr, "Element %s already in set. \n", element->value);
-        exit(1);
-    }
-
-    set->elements[set->size] = element;
-    set->size++;
-
-    if (set->size > 0 && set->size % DEFAULT_ELEMENT_ARRAY_LENGHT)
-    {
-        Element** elements = (Element **)realloc(set->elements, sizeof(Element *) * set->size + sizeof(Element *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
-
-        if(elements != NULL){
-            set->elements = elements;
-        }else{
-            fprintf(stderr, "Could not allocate more memory for a set");
-            exit(1);
-        }
-    }
-
-    set->elements[set->size] = initElement();
-}
-
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
 void finishPair(Pair *pair)
 {
     finishElement(pair->elementA);
     finishElement(pair->elementB);
 }
 
-void finishLastPair(Relation *relation)
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
+bool finishLastPair(Relation *relation)
 {
 
-    Pair* pair = relation->pairs[relation->size];
+    Pair *pair = relation->pairs[relation->size];
 
-    if(isPairInRelation(pair, relation)){
+    if (isPairInRelation(pair, relation))
+    {
         fprintf(stderr, "Pair already in relation");
-        exit(1);
+        return false;
     }
 
     finishPair(pair);
@@ -440,38 +603,124 @@ void finishLastPair(Relation *relation)
 
     if (relation->size > 0 && relation->size % DEFAULT_ELEMENT_ARRAY_LENGHT)
     {
-        Pair** pairs = (Pair **)realloc(relation->pairs, sizeof(Pair *) * relation->size + sizeof(Pair *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+        Pair **pairs = (Pair **)realloc(relation->pairs, sizeof(Pair *) * relation->size + sizeof(Pair *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
 
-        if(pairs != NULL){
+        if (pairs != NULL)
+        {
             relation->pairs = pairs;
-        }else{
-            fprintf(stderr ,"Could not allocate more space for a pair");
-            exit(1);
+        }
+        else
+        {
+            fprintf(stderr, "Could not allocate more space for a pair");
+            return false;
         }
     }
 
     relation->pairs[relation->size] = NULL;
+
+    return true;
 }
 
-void addCharToElement(Element* element, char c){
-    if(element->lenght < MAX_ELEMENT_LENGTH){
-        if(isCharCapitalLetter(c) || isCharLetter(c)){
+// --Parsing functions--
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
+bool parseToCommand(Command *command, char c)
+{
+    if (command->count >= COMMAND_ARG_SIZE)
+    {
+        fprintf(stderr, "Too many arguments.\n");
+        return false;
+    }
+
+    Element *element = &command->data[command->count];
+
+    if (c == ' ')
+    {
+        if (element->lenght > 0)
+        {
+            finishElement(element);
+            command->count++;
+        }
+    }
+    else
+    {
+        element->value[element->lenght] = c;
+        element->lenght++;
+    }
+
+    return true;
+}
+
+/**
+ * Check if a character is in range of ASCII values
+ * @param {char} ch - character to check
+ * @param {int} minChar - lowest ASCII value
+ * @param {int} maxChar - highest ASCII value
+ * @returns {bool} true if character is in range of values
+ */
+bool addSetElement(Set *set, Element *element)
+{
+    if (isInSet(element->value, set))
+    {
+        fprintf(stderr, "Element %s already in set. \n", element->value);
+        return false;
+    }
+
+    set->elements[set->size] = element;
+    set->size++;
+
+    if (set->size > 0 && set->size % DEFAULT_ELEMENT_ARRAY_LENGHT)
+    {
+        Element **elements = (Element **)realloc(set->elements, sizeof(Element *) * set->size + sizeof(Element *) * DEFAULT_ELEMENT_ARRAY_LENGHT);
+
+        if (elements != NULL)
+        {
+            set->elements = elements;
+        }
+        else
+        {
+            fprintf(stderr, "Could not allocate more memory for a set");
+            return false;
+        }
+    }
+
+    set->elements[set->size] = NULL;
+    return true;
+}
+bool addCharToElement(Element *element, char c)
+{
+    if (element->lenght < MAX_ELEMENT_LENGTH)
+    {
+        if (isCharCapitalLetter(c) || isCharLetter(c))
+        {
             element->value[element->lenght] = c;
             element->lenght++;
-        }else{
-            fprintf(stderr, "Element has special character or number");
-            exit(1);
         }
-    }else{
-        fprintf(stderr, "Size of element reached");
-        exit(1);
+        else
+        {
+            fprintf(stderr, "Element has special character or number");
+            return false;
+        }
     }
+    else
+    {
+        fprintf(stderr, "Size of element reached");
+        return false;
+    }
+
+    return true;
 }
 
-//Returns if set has ended
-bool parseToSet(Set *set, char c)
+// Returns if set has ended
+bool parseToSet(Set *set, char c, Data *data, FILE *file)
 {
-    if(set == NULL){
+    if (set == NULL)
+    {
         return false;
     }
 
@@ -479,9 +728,9 @@ bool parseToSet(Set *set, char c)
 
     if (c == ' ' || c == '\n' || c == EOF)
     {
-        if (element != NULL)
+        if (element != NULL && !addSetElement(set, element))
         {
-            addSetElement(set, element);
+            safeExit(data, file, 1);
         }
 
         if (c == '\n' || c == EOF)
@@ -495,18 +744,17 @@ bool parseToSet(Set *set, char c)
     }
     else
     {
-        if(element != NULL){
-            addCharToElement(element, c);
-        }else{
+        if (element == NULL || !addCharToElement(element, c))
+        {
             fprintf(stderr, "Wrong set initialization");
-            exit(1);
+            safeExit(data, file, 1);
         }
     }
 
     return false;
 }
 
-void parseToRelation(Relation *relation, char c)
+bool parseToRelation(Relation *relation, char c)
 {
     Pair *pair = relation->pairs[relation->size];
     Element *element = NULL;
@@ -523,7 +771,10 @@ void parseToRelation(Relation *relation, char c)
         }
         else if (c == ')')
         {
-            finishLastPair(relation);
+            if (!finishLastPair(relation))
+            {
+                return false;
+            }
         }
         else if (c == ' ' && pair->elementB == NULL)
         {
@@ -541,83 +792,42 @@ void parseToRelation(Relation *relation, char c)
             }
         }
 
-        if(element != NULL){
-            addCharToElement(element, c);
+        if (element != NULL && !addCharToElement(element, c))
+        {
+            return false;
         }
-    }else{
+    }
+    else
+    {
         fprintf(stderr, "Wrong relation initialization");
-        exit(1);
-    }
-}
-
-bool isSetValid(Set* set, Set* universe){
-    for (int i = 0; i < set->size; i++)
-    {
-        bool found = isInSet(set->elements[i]->value, universe);
-
-        if(!found){
-            return false;
-        }
-    }
-
-    return true;
-}
-
-bool isUniverseValid(Function* functions, Set* set){
-
-    if(isInSet("true", set) || isInSet("false", set))
-    {
         return false;
-    }
-
-    for (int i = 0; i < FUNCTION_COUNT; i++)
-    {
-        if(isInSet(functions[i].name, set)){
-            return false;
-        }
     }
 
     return true;
 }
 
 // --Data processing--
-void loadUniverse(Data* data, FILE* file){
+void loadUniverse(Data *data, FILE *file)
+{
     char c = getc(file);
 
-    if(c == 'U'){
+    if (c == 'U')
+    {
         Set *universe = initSet(DEFAULT_ELEMENT_ARRAY_LENGHT);
 
         do
         {
             c = getc(file);
-        }while (!parseToSet(universe, c));
+        } while (!parseToSet(universe, c, data, file));
 
         data->universe = universe;
         data->rows[data->size].set = universe;
         data->size++;
-    }else{
+    }
+    else
+    {
         fprintf(stderr, "Universe not found.\n");
-        exit(1);
-    }
-}
-
-void checkRelation(Relation* relation, Set* universe){
-    for(int i = 0; i < relation->size; i++){
-        Pair* pair = relation->pairs[i];
-        if(!isInSet(pair->elementA->value, universe) || !isInSet(pair->elementB->value, universe) ){
-            fprintf(stderr, "Element of a relation is not in universe.\n");
-            exit(1);
-        }
-    }
-}
-
-void checkSet(Set* set, Set* universe){
-    for(int i = 0; i < set->size; i++){
-        Element* element = set->elements[i];
-        if(!isInSet(element->value, universe)){
-            fprintf(stderr, "Element %s of a set is not in universe.\n", element->value);
-            exit(1);
-        }
+        safeExit(data, file, 1);
     }
 }
 
@@ -656,7 +866,9 @@ void loadFileData(FILE *file, Data *data)
             {
                 hasRelset = true;
                 relation = initRelation();
-            }else if(c == 'C'){
+            }
+            else if (c == 'C')
+            {
                 command = initCommand();
                 command->universe = data->universe;
                 hasCommand = true;
@@ -670,21 +882,27 @@ void loadFileData(FILE *file, Data *data)
             continue;
         }
 
-        if(c != '\n' && c != EOF){
-            if(command != NULL){
-                parseToCommand(command, c);
-            } else if (relation != NULL)
+        if (c != '\n' && c != EOF)
+        {
+            if (command != NULL && !parseToCommand(command, c))
             {
-                parseToRelation(relation, c);
+                safeExit(data, file, 1);
+            }
+            else if (relation != NULL && !parseToRelation(relation, c))
+            {
+                safeExit(data, file, 1);
             }
         }
 
-         if (parseToSet(set, c) || c == '\n' || c == EOF)
+        if (parseToSet(set, c, data, file) || c == '\n' || c == EOF)
         {
-            if(set != NULL){
-                checkSet(set, data->universe);
-            }else if (relation != NULL){
-                checkRelation(relation, data->universe);
+            if (set != NULL && !isSetValid(set, data->universe))
+            {
+                safeExit(data, file, 1);
+            }
+            else if (relation != NULL && !isRelationValid(relation, data->universe))
+            {
+                safeExit(data, file, 1);
             }
 
             data->size++;
@@ -693,32 +911,39 @@ void loadFileData(FILE *file, Data *data)
 
     } while (c != EOF && data->size <= MAX_ROWS);
 
-    if(data->size > MAX_ROWS){
+    if (data->size > MAX_ROWS)
+    {
         fprintf(stderr, "Too many rows, maximum is 1000.\n");
-        exit(1);
-    }else if(data->size < 2){
+        safeExit(data, file, 1);
+    }
+    else if (data->size < 2)
+    {
         fprintf(stderr, "There is only an universe.\n");
-        exit(1);
+        safeExit(data, file, 1);
     }
 
-    if(!hasRelset){
+    if (!hasRelset)
+    {
         fprintf(stderr, "No relation or set found\n");
-        exit(1);
+        safeExit(data, file, 1);
     }
 
-    if(!hasCommand){
+    if (!hasCommand)
+    {
         fprintf(stderr, "No command found.\n");
-        exit(1);
+        safeExit(data, file, 1);
     }
 }
 
 // --Print functions--
 
-void printBool(bool value){
+void printBool(bool value)
+{
     value ? printf("true\n") : printf("false\n");
 }
 
-void printUniverse(Set *universe){
+void printUniverse(Set *universe)
+{
     if (universe != NULL)
     {
         printf("U");
@@ -757,49 +982,18 @@ void printRelation(Relation *relation)
 }
 
 // --Set functions--
-
-bool isBiCommand(Command* command){
-    return command->setA != NULL && command->setB != NULL && command->universe != NULL;
-}
-
-Set* getUnSet(Command* command){
-    if(command->universe != NULL){
-        if(command->setA != NULL){
-            return command->setA;
-        }else if(command->setB != NULL){
-            return command->setB;
-        }
-    }
-    return NULL;
-}
-
-bool isRelCommand(Command* command){
-    return command->rel != NULL && command->universe != NULL;
-}
-
-void exitFunction(){
-    fprintf(stderr, "Function arguments do not meet requirements.\n");
-    exit(1);
-}
-
-void checkArguments(Command* com, int count){
-    if(com->count - 1 > count){
-        exitFunction();
-    }
-}
-
 /*
 empty A - tiskne true nebo false podle toho, jestli je množina definovaná na øádku A prázdná nebo neprázdná.
 */
 
 void empty(Command *com)
 {
-    checkArguments(com, 1);
+    Set *set = getUnSet(com);
 
-    Set* set = getUnSet(com);
-
-    if(isRelCommand(com) || isBiCommand(com) || set == NULL){
-        exitFunction();
+    if (isRelCommand(com) || isBiCommand(com) || set == NULL || com->count - 1 > 1)
+    {
+        com->success = false;
+        return;
     }
 
     printBool(com->setA->size == 0);
@@ -810,12 +1004,12 @@ card A - tiskne poèet prvkù v množinì A (definované na øádku A).
 */
 void card(Command *com)
 {
-    checkArguments(com, 1);
+    Set *set = getUnSet(com);
 
-    Set* set = getUnSet(com);
-
-    if(isRelCommand(com) || isBiCommand(com) || set == NULL){
-        exitFunction();
+    if (isRelCommand(com) || isBiCommand(com) || set == NULL || com->count - 1 > 1)
+    {
+        com->success = false;
+        return;
     }
 
     printf("%d\n", com->setA->size);
@@ -826,14 +1020,15 @@ complement A - tiskne doplnìk množiny A.
 */
 void complement(Command *com)
 {
-    checkArguments(com, 1);
-    Set* set = getUnSet(com);
+    Set *set = getUnSet(com);
 
-    if(isRelCommand(com) || isBiCommand(com) || set == NULL){
-        exitFunction();
+    if (isRelCommand(com) || isBiCommand(com) || set == NULL || com->count - 1 > 1)
+    {
+        com->success = false;
+        return;
     }
 
-    Set* universe = com->universe;
+    Set *universe = com->universe;
 
     printf("S");
     for (int i = 0; i < universe->size; i++)
@@ -860,29 +1055,34 @@ union A B - tiskne sjednocení množin A a B.
 */
 void setUnion(Command *com)
 {
-    checkArguments(com, 2);
-
-    if(!isBiCommand(com) || isRelCommand(com)){
-        exitFunction();
+    if (!isBiCommand(com) || isRelCommand(com) || com->count - 1 > 2)
+    {
+        com->success = false;
+        return;
     }
 
-    Set* set1 = com->setA;
-    Set* set2 = com->setB;
+    Set *set1 = com->setA;
+    Set *set2 = com->setB;
 
     printf("S");
-    for(int i=0;i<set1->size;i++){
+    for (int i = 0; i < set1->size; i++)
+    {
         bool found = false;
-        for(int j=0;j<set2->size;j++){
-            if(strcmp(set1->elements[i]->value, set2->elements[j]->value)==0){
+        for (int j = 0; j < set2->size; j++)
+        {
+            if (strcmp(set1->elements[i]->value, set2->elements[j]->value) == 0)
+            {
                 found = true;
                 break;
-                }
             }
-            if (found == false){
-                printf(" %s", set1->elements[i]->value);
+        }
+        if (found == false)
+        {
+            printf(" %s", set1->elements[i]->value);
         }
     }
-    for(int k=0;k<set2->size;k++){
+    for (int k = 0; k < set2->size; k++)
+    {
         printf(" %s", set2->elements[k]->value);
     }
     printf("\n");
@@ -893,9 +1093,10 @@ intersect A B - tiskne prùnik množin A a B.
 */
 void intersect(Command *com)
 {
-    checkArguments(com, 2);
-    if(!isBiCommand(com) || isRelCommand(com)){
-        exitFunction();
+    if (!isBiCommand(com) || isRelCommand(com) || com->count - 1 > 2)
+    {
+        com->success = false;
+        return;
     }
 
     Set *set1 = com->setA;
@@ -903,7 +1104,7 @@ void intersect(Command *com)
 
     int size = set1->size > set2->size ? set1->size : set2->size;
 
-    Set* set = initSet(size);
+    Set *set = initSet(size);
 
     for (int i = 0; i < set1->size; i++)
     {
@@ -918,7 +1119,7 @@ void intersect(Command *com)
     }
 
     printSet(set);
-    free(set);
+    freeSet(set);
 }
 
 /*
@@ -926,16 +1127,17 @@ minus A B - tiskne rozdíl množin A \ B.
 */
 void minus(Command *com)
 {
-    checkArguments(com, 2);
-    if(!isBiCommand(com) || isRelCommand(com)){
-        exitFunction();
+    if (!isBiCommand(com) || isRelCommand(com) || com->count - 1 > 2)
+    {
+        com->success = false;
+        return;
     }
 
     Set *set1 = com->setA;
     Set *set2 = com->setB;
 
     int size = set1->size > set2->size ? set1->size : set2->size;
-    Set* set = initSet(size);
+    Set *set = initSet(size);
 
     for (int i = 0; i < set1->size; i++)
     {
@@ -949,14 +1151,15 @@ void minus(Command *com)
             }
         }
 
-        if(!found){
+        if (!found)
+        {
             set->elements[set->size] = set1->elements[i];
             set->size++;
         }
     }
 
     printSet(set);
-    free(set);
+    freeSet(set);
 }
 
 /*
@@ -964,21 +1167,24 @@ subseteq A B - tiskne true nebo false podle toho, jestli je množina A podmnoži
 */
 void subseteq(Command *com)
 {
-    checkArguments(com, 2);
-    if(!isBiCommand(com) || isRelCommand(com)){
-        exitFunction();
+    if (!isBiCommand(com) || isRelCommand(com) || com->count - 1 > 2)
+    {
+        com->success = false;
+        return;
     }
 
     Set *set1 = com->setA;
     Set *set2 = com->setB;
 
-    if(com->setA->size > 0){
+    if (com->setA->size > 0)
+    {
 
         for (int i = 0; i < set1->size; i++)
         {
-            Element* elementA = set1->elements[i];
+            Element *elementA = set1->elements[i];
 
-            if (!isInSet(elementA->value, set2)){
+            if (!isInSet(elementA->value, set2))
+            {
                 printBool(false);
                 return;
             }
@@ -993,21 +1199,24 @@ subset A B - tiskne true nebo false, jestli je množina A vlastní podmnožina m
 */
 void subset(Command *com)
 {
-    checkArguments(com, 2);
-    if(!isBiCommand(com) || isRelCommand(com)){
-        exitFunction();
+    if (!isBiCommand(com) || isRelCommand(com) || com->count - 1 > 2)
+    {
+        com->success = false;
+        return;
     }
 
     Set *set1 = com->setA;
     Set *set2 = com->setB;
 
-    if(com->setA->size > 0){
+    if (com->setA->size > 0)
+    {
 
         for (int i = 0; i < set1->size; i++)
         {
-            Element* elementA = set1->elements[i];
+            Element *elementA = set1->elements[i];
 
-            if (!isInSet(elementA->value, set2)){
+            if (!isInSet(elementA->value, set2))
+            {
                 printBool(false);
                 return;
             }
@@ -1022,21 +1231,24 @@ equals A B - tiskne true nebo false, jestli jsou množiny rovny.
 */
 void equals(Command *com)
 {
-    checkArguments(com, 2);
-    if(!isBiCommand(com) || isRelCommand(com)){
-        exitFunction();
+    if (!isBiCommand(com) || isRelCommand(com) || com->count - 1 > 2)
+    {
+        com->success = false;
+        return;
     }
 
     Set *set1 = com->setA;
     Set *set2 = com->setB;
 
-    if(com->setA->size > 0){
+    if (com->setA->size > 0)
+    {
 
         for (int i = 0; i < set1->size; i++)
         {
-            Element* elementA = set1->elements[i];
+            Element *elementA = set1->elements[i];
 
-            if (!isInSet(elementA->value, set2)){
+            if (!isInSet(elementA->value, set2))
+            {
                 printBool(false);
                 return;
             }
@@ -1052,35 +1264,35 @@ reflexive R - tiskne true nebo false, jestli je relace reflexivní.
 */
 void reflexive(Command *com)
 {
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
+    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
+    {
+        com->success = false;
+        return;
     }
 
     Relation *rel = com->rel;
     Set *universe = com->universe;
 
-
-    //zjistim, zda je vice rel nez universe
-    if(rel->size < universe->size)
+    // zjistim, zda je vice rel nez universe
+    if (rel->size < universe->size)
     {
-        printf("false\n");
+        printBool(false);
     }
     else
     {
         int uni[universe->size];
-        for(int i = 0; i < universe->size; i++)
+        for (int i = 0; i < universe->size; i++)
         {
             uni[i] = 0;
         }
 
-        for(int i = 0; i < rel->size; i++)
+        for (int i = 0; i < rel->size; i++)
         {
-            if(strcoll(rel->pairs[i]->elementA->value, rel->pairs[i]->elementB->value) == 0)
+            if (strcoll(rel->pairs[i]->elementA->value, rel->pairs[i]->elementB->value) == 0)
             {
-                for(int y = 0; y < universe->size; y++)
+                for (int y = 0; y < universe->size; y++)
                 {
-                    if(strcoll(rel->pairs[i]->elementA->value, universe->elements[y]->value)==0)
+                    if (strcoll(rel->pairs[i]->elementA->value, universe->elements[y]->value) == 0)
                     {
                         uni[y] = 1;
                     }
@@ -1088,9 +1300,9 @@ void reflexive(Command *com)
             }
         }
         int citac = 0;
-        for(int i = 0; i < universe->size; i++)
+        for (int i = 0; i < universe->size; i++)
         {
-            if(uni[i] == 1)
+            if (uni[i] == 1)
             {
                 citac++;
             }
@@ -1105,38 +1317,39 @@ symmetric R - tiskne true nebo false, jestli je relace symetrická.
 */
 void symmetric(Command *com)
 {
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
+    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
+    {
+        com->success = false;
+        return;
     }
 
     Relation *rel = com->rel;
 
     int dvojice[rel->size];
-    for(int i = 0; i <rel->size;i++)
+    for (int i = 0; i < rel->size; i++)
     {
         dvojice[i] = 0;
     }
 
-    //vezmu prvni dvojici
-    for(int i = 0; i < rel->size; i++)
+    // vezmu prvni dvojici
+    for (int i = 0; i < rel->size; i++)
     {
-        //printf("[%s, %s]\n", rel->pairs[i]->elementA->value, rel->pairs[i]->elementB->value);
-        //zjistim, zda je stejna - napr [A, A]
-        if(strcoll(rel->pairs[i]->elementA->value, rel->pairs[i]->elementB->value) == 0)
+        // printf("[%s, %s]\n", rel->pairs[i]->elementA->value, rel->pairs[i]->elementB->value);
+        // zjistim, zda je stejna - napr [A, A]
+        if (strcoll(rel->pairs[i]->elementA->value, rel->pairs[i]->elementB->value) == 0)
         {
             dvojice[i] = 1;
         }
         else
         {
-            //beru dvojici na porovnavani
-            for(int y = 0; y < rel->size; y++)
+            // beru dvojici na porovnavani
+            for (int y = 0; y < rel->size; y++)
             {
-                if(i != y)
+                if (i != y)
                 {
-                    if(strcoll(rel->pairs[i]->elementA->value, rel->pairs[y]->elementB->value) == 0)
+                    if (strcoll(rel->pairs[i]->elementA->value, rel->pairs[y]->elementB->value) == 0)
                     {
-                        if(strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementA->value)==0)
+                        if (strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementA->value) == 0)
                         {
                             dvojice[i] = 1;
                         }
@@ -1147,9 +1360,9 @@ void symmetric(Command *com)
     }
 
     int citac = 0;
-    for(int i = 0; i < rel->size; i++)
+    for (int i = 0; i < rel->size; i++)
     {
-        if(dvojice[i] == 1)
+        if (dvojice[i] == 1)
         {
             citac++;
         }
@@ -1163,27 +1376,28 @@ antisymmetric R - tiskne true nebo false, jestli je relace antisymetrická.
 */
 void antisymmetric(Command *com)
 {
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
+    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
+    {
+        com->success = false;
+        return;
     }
 
     Relation *rel = com->rel;
 
     int symetrie = 0;
 
-    for(int i = 0; i <rel->size; i++)
+    for (int i = 0; i < rel->size; i++)
     {
-        //kontrola, zda nejsou stejne
-        if(strcoll(rel->pairs[i]->elementA->value, rel->pairs[i]->elementB->value) != 0)
+        // kontrola, zda nejsou stejne
+        if (strcoll(rel->pairs[i]->elementA->value, rel->pairs[i]->elementB->value) != 0)
         {
-            for(int y = 0; y < rel->size; y++)
+            for (int y = 0; y < rel->size; y++)
             {
-                if(i != y)
+                if (i != y)
                 {
-                    if(strcoll(rel->pairs[i]->elementA->value, rel->pairs[y]->elementB->value) == 0)
+                    if (strcoll(rel->pairs[i]->elementA->value, rel->pairs[y]->elementB->value) == 0)
                     {
-                        if(strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementA->value)==0)
+                        if (strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementA->value) == 0)
                         {
                             symetrie++;
                         }
@@ -1201,37 +1415,37 @@ transitive R - tiskne true nebo false, jestli je relace tranzitivní.
 */
 void transitive(Command *com)
 {
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
+    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
+    {
+        com->success = false;
+        return;
     }
 
     Relation *rel = com->rel;
 
     int chyba = 0;
 
-    for(int i = 0; i < rel->size; i++)
+    for (int i = 0; i < rel->size; i++)
     {
-        //kontrola, zda nejsou stejne
-        if(strcoll(rel->pairs[i]->elementA->value, rel->pairs[i]->elementB->value) != 0)
+        // kontrola, zda nejsou stejne
+        if (strcoll(rel->pairs[i]->elementA->value, rel->pairs[i]->elementB->value) != 0)
         {
-            for(int y = 0; y < rel->size; y++)
+            for (int y = 0; y < rel->size; y++)
             {
-                if(i != y)
+                if (i != y)
                 {
-                    if(strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementA->value) == 0)
+                    if (strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementA->value) == 0)
                     {
                         int nalezeno = 0;
 
-                        for(int x = 0; x < rel->size; x++)
+                        for (int x = 0; x < rel->size; x++)
                         {
-                            if((strcoll(rel->pairs[x]->elementA->value, rel->pairs[i]->elementA->value) == 0)
-                              &(strcoll(rel->pairs[x]->elementB->value, rel->pairs[y]->elementB->value) == 0))
+                            if ((strcoll(rel->pairs[x]->elementA->value, rel->pairs[i]->elementA->value) == 0) & (strcoll(rel->pairs[x]->elementB->value, rel->pairs[y]->elementB->value) == 0))
                             {
                                 nalezeno++;
                             }
                         }
-                        if(nalezeno == 0)
+                        if (nalezeno == 0)
                         {
                             chyba++;
                         }
@@ -1249,24 +1463,25 @@ function R - tiskne true nebo false, jestli je relace R funkcí.
 */
 void function(Command *com)
 {
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
+    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
+    {
+        com->success = false;
+        return;
     }
 
     Relation *rel = com->rel;
 
     int chyba = 0;
 
-    for(int i = 0; i < rel->size; i++)
+    for (int i = 0; i < rel->size; i++)
     {
-        for(int y = 0; y < rel->size; y++)
+        for (int y = 0; y < rel->size; y++)
         {
-            if(i != y)
+            if (i != y)
             {
-                if(strcoll(rel->pairs[i]->elementA->value, rel->pairs[y]->elementA->value)==0)
+                if (strcoll(rel->pairs[i]->elementA->value, rel->pairs[y]->elementA->value) == 0)
                 {
-                    if(strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementB->value)!=0)
+                    if (strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementB->value) != 0)
                     {
                         chyba++;
                     }
@@ -1283,9 +1498,10 @@ domain R - tiskne definièní obor funkce R (lze aplikovat i na relace - první 
 */
 void domain(Command *com)
 {
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
+    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
+    {
+        com->success = false;
+        return;
     }
 
     Relation *rel = com->rel;
@@ -1293,27 +1509,26 @@ void domain(Command *com)
 
     int vypis[universe->size];
 
-    for(int i = 0; i < universe->size; i++)
+    for (int i = 0; i < universe->size; i++)
     {
         vypis[i] = 0;
     }
 
-    for(int i = 0; i < rel->size; i++)
+    for (int i = 0; i < rel->size; i++)
     {
-        for(int y = 0; y < universe->size; y++)
+        for (int y = 0; y < universe->size; y++)
         {
-            if(strcoll(rel->pairs[i]->elementA->value, universe->elements[y]->value) == 0)
+            if (strcoll(rel->pairs[i]->elementA->value, universe->elements[y]->value) == 0)
             {
                 vypis[y] = 1;
             }
         }
-
     }
 
     printf("S");
-    for(int i = 0; i < universe->size; i++)
+    for (int i = 0; i < universe->size; i++)
     {
-        if(vypis[i] == 1)
+        if (vypis[i] == 1)
         {
             printf(" %s", universe->elements[i]->value);
         }
@@ -1326,9 +1541,10 @@ codomain R - tiskne obor hodnot funkce R (lze aplikovat i na relace - druhé prv
 */
 void codomain(Command *com)
 {
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
+    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
+    {
+        com->success = false;
+        return;
     }
 
     Relation *rel = com->rel;
@@ -1336,16 +1552,16 @@ void codomain(Command *com)
 
     int vypis[universe->size];
 
-    for(int i = 0; i < universe->size; i++)
+    for (int i = 0; i < universe->size; i++)
     {
         vypis[i] = 0;
     }
 
-    for(int i = 0; i < rel->size; i++)
+    for (int i = 0; i < rel->size; i++)
     {
-        for(int y = 0; y < universe->size; y++)
+        for (int y = 0; y < universe->size; y++)
         {
-            if(strcoll(rel->pairs[i]->elementB->value, universe->elements[y]->value) == 0)
+            if (strcoll(rel->pairs[i]->elementB->value, universe->elements[y]->value) == 0)
             {
                 vypis[y] = 1;
             }
@@ -1353,9 +1569,9 @@ void codomain(Command *com)
     }
 
     printf("S");
-    for(int i = 0; i < universe->size; i++)
+    for (int i = 0; i < universe->size; i++)
     {
-        if(vypis[i] == 1)
+        if (vypis[i] == 1)
         {
             printf(" %s", universe->elements[i]->value);
         }
@@ -1368,12 +1584,13 @@ injective R - tiskne true nebo false, jestli je funkce R injektivní.
 */
 void injective(Command *com)
 {
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
+    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
+    {
+        com->success = false;
+        return;
     }
 
-   // printRelation(com->rel);
+    // printRelation(com->rel);
 }
 
 /*
@@ -1381,11 +1598,12 @@ surjective R - tiskne true nebo false, jestli je funkce R surjektivní.
 */
 void surjective(Command *com)
 {
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
+    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
+    {
+        com->success = false;
+        return;
     }
-    //printRelation(com->rel);
+    // printRelation(com->rel);
 }
 
 /*
@@ -1393,90 +1611,39 @@ bijective R - tiskne true nebo false, jestli je funkce R bijektivní.
 */
 void bijective(Command *com)
 {
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
+    if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
+    {
+        com->success = false;
+        return;
     }
-   // printRelation(com->rel);
+    // printRelation(com->rel);
 }
 
-//Advanced commmands
-
-/*
-closure_ref R - tiskne reflexivní uzávìr relace R
-*/
-void closureRef(Command *com)
+// Command functions
+bool functionLookup(Function *functions, Command *com)
 {
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
-    }
-      //  printRelation(com->rel);
-}
-
-/*
-closure_sym R - tiskne symetrický uzávìr relace R
-*/
-void closureSym(Command *com)
-{
-    checkArguments(com, 1);
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
-    }
-      //  printRelation(com->rel);
-}
-
-/*
-closure_trans R - tiskne tranzitivní uzávìr relace R
-*/
-void closureTrans(Command *com)
-{
-    if(!isRelCommand(com) || isBiCommand(com)){
-        exitFunction();
-    }
-       // printRelation(com->rel);
-}
-
-//-- Bonus --
-/*
-select A N - vybere náhodný prvek z množiny nebo relace A a tiskne ho. V pøípadì, že je množina A prázdná, pøeskoèí vykonávání pøíkazu na øádek N vstupního souboru. N v takovém pøípadì musí oznaèovat existující øádek ve vstupním souboru.
-*/
-void selectFromRelation(Command *com)
-{
-    checkArguments(com, 1);
-     //   printRelation(com->rel);
-}
-
-void selectFromSet(Command *com)
-{
-    //    printSet(com->setA);
-}
-
-// Arguments
-/*
-Rozšíøení všech pøíkazù, jejichž výsledkem je množina nebo relace, definuje novou množinu nebo relaci identifikovanou èíslem øádku, na kterém se nachází daná operace.
-Rozšíøení všech pøíkazù, které tisknou true nebo false o další argument N. V pøípadì, že operace konèí s výsledkem false, následující øádek, který se zpracovává, bude na øádku N (nikoliv bezprostøednì následující).
-*/
-//-- Bonus --
-
-//Command functions
-void functionLookup(Function* functions, Command *com)
-{
-    for(int i = 0; i < FUNCTION_COUNT; i++){
+    for (int i = 0; i < FUNCTION_COUNT; i++)
+    {
         Function function = functions[i];
-        if(!strcmp(function.name, com->data[0].value)){
+        if (!strcmp(function.name, com->data[0].value))
+        {
             function.func(com);
-            return;
+            if (!com->success)
+            {
+                fprintf(stderr, "Function arguments do not meet requirements.\n");
+                return false;
+            }
+            return true;
         }
     }
 
     fprintf(stderr, "Function %s not found", com->data[0].value);
-    exit(1);
+    return false;
 }
 
-void initFunctions(Function* functions)
+void initFunctions(Function *functions)
 {
-    //unsetfun
+    // unsetfun
     strcpy(functions[0].name, "empty");
     functions[0].func = empty;
 
@@ -1486,71 +1653,55 @@ void initFunctions(Function* functions)
     strcpy(functions[2].name, "complement");
     functions[2].func = complement;
 
-    strcpy(functions[3].name, "select");
-    functions[3].func = selectFromSet;
+    // binsetfun
+    strcpy(functions[3].name, "union");
+    functions[3].func = setUnion;
 
-    //binsetfun
-    strcpy(functions[4].name, "union");
-    functions[4].func = setUnion;
+    strcpy(functions[4].name, "intersect");
+    functions[4].func = intersect;
 
-    strcpy(functions[5].name, "intersect");
-    functions[5].func = intersect;
+    strcpy(functions[5].name, "minus");
+    functions[5].func = minus;
 
-    strcpy(functions[6].name, "minus");
-    functions[6].func = minus;
+    strcpy(functions[6].name, "subseteq");
+    functions[6].func = subseteq;
 
-    strcpy(functions[7].name, "subseteq");
-    functions[7].func = subseteq;
+    strcpy(functions[7].name, "subset");
+    functions[7].func = subset;
 
-    strcpy(functions[8].name, "subset");
-    functions[8].func = subset;
+    strcpy(functions[8].name, "equals");
+    functions[8].func = equals;
 
-    strcpy(functions[9].name, "equals");
-    functions[9].func = equals;
+    // unRelFunMap
+    strcpy(functions[9].name, "reflexive");
+    functions[9].func = reflexive;
 
-         //unRelFunMap
-    strcpy(functions[10].name, "reflexive");
-     functions[10].func = reflexive;
+    strcpy(functions[10].name, "symmetric");
+    functions[10].func = symmetric;
 
-     strcpy(functions[11].name, "symmetric");
-     functions[11].func = symmetric;
+    strcpy(functions[11].name, "antisymmetric");
+    functions[11].func = antisymmetric;
 
-     strcpy(functions[12].name, "antisymmetric");
-     functions[12].func = antisymmetric;
+    strcpy(functions[12].name, "transitive");
+    functions[12].func = transitive;
 
-     strcpy(functions[13].name, "transitive");
-     functions[13].func = transitive;
+    strcpy(functions[13].name, "function");
+    functions[13].func = function;
 
-     strcpy(functions[14].name, "function");
-     functions[14].func = function;
+    strcpy(functions[14].name, "domain");
+    functions[14].func = domain;
 
-     strcpy(functions[15].name, "domain");
-     functions[15].func = domain;
+    strcpy(functions[15].name, "codomain");
+    functions[15].func = codomain;
 
-    strcpy(functions[16].name, "codomain");
-    functions[16].func = codomain;
+    strcpy(functions[16].name, "injective");
+    functions[16].func = injective;
 
-    strcpy(functions[17].name, "closureRef");
-    functions[17].func = closureRef;
+    strcpy(functions[17].name, "surjective");
+    functions[17].func = surjective;
 
-    strcpy(functions[18].name, "closureSym");
-   functions[18].func = closureSym;
-
-    strcpy(functions[19].name, "closureTrans");
-    functions[19].func = closureTrans;
-
-     strcpy(functions[20].name, "selectFromRelation");
-    functions[20].func = selectFromRelation;
-
-         //triRelFunMap
-    strcpy(functions[21].name, "injective");
-    functions[21].func = injective;
-
-     strcpy(functions[22].name, "surjective");
-     functions[22].func = surjective;
-
-    strcpy(functions[23].name, "bijective");
-    functions[23].func = bijective;
+    strcpy(functions[18].name, "bijective");
+    functions[18].func = bijective;
 }
 
 int main(int argc, char *argv[])
@@ -1563,7 +1714,7 @@ int main(int argc, char *argv[])
 
     char *fileName = argv[1];
 
-    //Test if project is running
+    // Test if project is running
     Data *data = initData();
 
     Function functions[FUNCTION_COUNT];
@@ -1580,9 +1731,10 @@ int main(int argc, char *argv[])
 
     loadUniverse(data, file);
 
-    if(!isUniverseValid(functions, data->universe)){
+    if (!isUniverseValid(functions, data->universe))
+    {
         fprintf(stderr, "Universe is not valid");
-        return 1;
+        safeExit(data, file, 1);
     }
 
     printUniverse(data->universe);
@@ -1592,25 +1744,29 @@ int main(int argc, char *argv[])
     for (int i = 1; i < data->size; i++)
     {
         Row *row = &data->rows[i];
-        if(row->command != NULL){
+        if (row->command != NULL)
+        {
             Command *command = row->command;
             finishCommand(command, data);
-            functionLookup(functions, command);
-        }else if (row->set != NULL)
+            if (!functionLookup(functions, command))
+            {
+                safeExit(data, file, 1);
+            }
+        }
+        else if (row->set != NULL)
         {
             printSet(row->set);
-        }else if(row->relation != NULL)
+        }
+        else if (row->relation != NULL)
         {
             printRelation(row->relation);
-        }else{
+        }
+        else
+        {
             fprintf(stderr, "Invalid row");
-            printf("%d \n", i);
-            return 1;
+            safeExit(data, file, 1);
         }
     }
 
-    freeData(data);
-    fclose(file);
-
-    return 0;
+    safeExit(data, file, 0);
 }
