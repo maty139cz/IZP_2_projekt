@@ -3,7 +3,7 @@
 * @name: setcal.c
 **/
 
-// Basic libraries.
+/// Basic libraries.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -99,11 +99,9 @@ typedef struct
 
 // --Initializers/Constructors--
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief initializes an empty element 
+ * 
+ * @return Element* the empty element 
  */
 Element *initElement()
 {
@@ -114,11 +112,10 @@ Element *initElement()
 }
 
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief initializes an empty set
+ * 
+ * @param size size of the first element
+ * @return Set* the initialize set 
  */
 Set *initSet(int size)
 {
@@ -130,11 +127,9 @@ Set *initSet(int size)
 }
 
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief initializes an empty relation
+ * 
+ * @return Relation* the empty relation 
  */
 Relation *initRelation()
 {
@@ -146,11 +141,10 @@ Relation *initRelation()
 }
 
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief initializes an empty pair on the end of given relation 
+ * 
+ * @param relation the given relation 
+ * @return Pair* pointer on the empty pair
  */
 Pair *initPair(Relation *relation)
 {
@@ -165,11 +159,9 @@ Pair *initPair(Relation *relation)
 }
 
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief initializes the data array
+ * 
+ * @return Data* the data array 
  */
 Data *initData()
 {
@@ -179,11 +171,9 @@ Data *initData()
 }
 
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief initializes an empty command
+ * 
+ * @return Command* the pointer on the empty command 
  */
 Command *initCommand()
 {
@@ -206,11 +196,9 @@ Command *initCommand()
 
 // --Destructors--
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief frees the given element
+ * 
+ * @param element the pointer to the given element 
  */
 void freeElement(Element *element)
 {
@@ -218,11 +206,9 @@ void freeElement(Element *element)
 }
 
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief frees the given pair 
+ * 
+ * @param pair pointer on the given pair 
  */
 void freePair(Pair *pair)
 {
@@ -232,11 +218,9 @@ void freePair(Pair *pair)
 }
 
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief frees the given relation 
+ * 
+ * @param relation pointer on the given relation 
  */
 void freeReleation(Relation *relation)
 {
@@ -249,11 +233,9 @@ void freeReleation(Relation *relation)
 }
 
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief frees the given set 
+ * 
+ * @param set pointer on the given set 
  */
 void freeSet(Set *set)
 {
@@ -266,11 +248,9 @@ void freeSet(Set *set)
 }
 
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief frees the data array 
+ * 
+ * @param data pointer on the data array
  */
 void freeData(Data *data)
 {
@@ -296,6 +276,13 @@ void freeData(Data *data)
     free(data);
 }
 
+/**
+ * @brief used for safe shutdown of the programme when an error occurs 
+ * 
+ * @param data pointer to the data array
+ * @param file the FILE pointer on the file with the data 
+ * @param state the exit code 
+ */
 void safeExit(Data *data, FILE *file, int state)
 {
     freeData(data);
@@ -305,11 +292,10 @@ void safeExit(Data *data, FILE *file, int state)
 
 // --Print functions--
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief prints the elements given on stdout 
+ * 
+ * @param elements pointer on an array of elements 
+ * @param size size of the array of elements 
  */
 void printElements(Element **elements, int size)
 {
@@ -321,11 +307,13 @@ void printElements(Element **elements, int size)
 
 // --Util functions--
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief Check if a character is in range of ASCII values
+ * 
+ * @param ch - character to check
+ * @param minChar - lowest ASCII value
+ * @param maxChar - highest ASCII value
+ * @return true if character is in range of values
+ * @return false if character is not in range of values
  */
 bool isCharInRange(char ch, int minChar, int maxChar)
 {
@@ -333,10 +321,10 @@ bool isCharInRange(char ch, int minChar, int maxChar)
 }
 
 /**
- * Uses isCharInRange function
- * Range is set between lowest and highest capital letters ASCII characters
- * @param {char} ch - character to check
- * @returns {bool} true if character is in range of ASCII capital letters
+ * @brief  Check if a character is a capital letter 
+ *
+ * @param  ch - character to check
+ * @return true if character is in range of ASCII capital letters
  */
 bool isCharCapitalLetter(char ch)
 {
@@ -344,10 +332,11 @@ bool isCharCapitalLetter(char ch)
 }
 
 /**
- * Uses isCharInRange function
- * Range is set between lowest and highest letters ASCII characters
- * @param {char} ch - character to check
- * @returns {bool} true if character is in range of ASCII letters
+ * @brief checks if given character is a letter 
+ * 
+ * @param ch the given character
+ * @return true if the character is a letter  
+ * @return false if the character is a letter 
  */
 bool isCharLetter(char ch)
 {
@@ -355,10 +344,11 @@ bool isCharLetter(char ch)
 }
 
 /**
- * Uses isCharInRange function
- * Range is set between lowest and highest number ASCII characters
- * @param {char} ch - character to check
- * @returns {bool} true if character is in range of ASCII numbers
+ * @brief checks if given character is a number
+ * 
+ * @param ch the given character 
+ * @return true if the character is a number 
+ * @return false if the character is not a number 
  */
 bool isCharNumber(char ch)
 {
@@ -366,8 +356,11 @@ bool isCharNumber(char ch)
 }
 
 /**
- * Checks if string is a number
- * @param {char*} Pointer to a string;
+ * @brief Checks if the given string is a number
+ * 
+ * @param char Pointer to a string
+ * @return true if string is a number
+ * @return false if string is not a number 
  */
 bool isPositiveNumber(char *string)
 {
@@ -384,7 +377,14 @@ bool isPositiveNumber(char *string)
     }
     return true;
 }
-
+/**
+ * @brief checks if the given value is in the given set 
+ * 
+ * @param value the value that is sought  
+ * @param set the checked set 
+ * @return true if the value is found 
+ * @return false if the value is not found
+ */
 bool isInSet(char *value, Set *set)
 {
     for (int i = 0; i < set->size; i++)
@@ -397,7 +397,14 @@ bool isInSet(char *value, Set *set)
 
     return false;
 }
-
+/**
+ * @brief checks if given pair is in a relation 
+ * 
+ * @param pair the pair that is sought 
+ * @param rel the check relation 
+ * @return true if the pair is found 
+ * @return false if the pair is not found 
+ */
 bool isPairInRelation(Pair *pair, Relation *rel)
 {
     for (int i = 0; i < rel->size; i++)
@@ -411,7 +418,14 @@ bool isPairInRelation(Pair *pair, Relation *rel)
 
     return false;
 }
-
+/**
+ * @brief check if all elements in all pairs belong to the given set  
+ * 
+ * @param relation the relation that is checked 
+ * @param universe the set that we check against 
+ * @return true if all elements belong to the universe   
+ * @return false if all elements do not belong to the universe  
+ */
 bool isRelationValid(Relation *relation, Set *universe)
 {
 
@@ -427,7 +441,14 @@ bool isRelationValid(Relation *relation, Set *universe)
 
     return true;
 }
-
+/**
+ * @brief check if all elements in a set belong to the given set  
+ * 
+ * @param set the checked set 
+ * @param universe the set that we check against 
+ * @return true if all elements belong to the universe   
+ * @return false if all elements do not belong to the universe  
+ */
 bool isSetValid(Set *set, Set *universe)
 {
     for (int i = 0; i < set->size; i++)
@@ -441,7 +462,14 @@ bool isSetValid(Set *set, Set *universe)
     }
     return true;
 }
-
+/**
+ * @brief check if the given set does not contain prohibited values such as names of functions, true and false  
+ * 
+ * @param functions struct of functions 
+ * @param set the checked set 
+ * @return true if prohibited values were found 
+ * @return false if prohibited values were not found 
+ */
 bool isUniverseValid(Function *functions, Set *set)
 {
 
@@ -460,12 +488,23 @@ bool isUniverseValid(Function *functions, Set *set)
 
     return true;
 }
-
+/**
+ * @brief check if the given command has two sets given 
+ * 
+ * @param command checked command 
+ * @return true if it does have two sets given 
+ * @return false if it does not have two sets given 
+ */
 bool isBiCommand(Command *command)
 {
     return command->setA != NULL && command->setB != NULL && command->universe != NULL;
 }
-
+/**
+ * @brief return a set from unary command 
+ * 
+ * @param command the given command 
+ * @return Set* pointer to the set in the command 
+ */
 Set *getUnSet(Command *command)
 {
     if (command->universe != NULL)
@@ -481,19 +520,24 @@ Set *getUnSet(Command *command)
     }
     return NULL;
 }
-
+/**
+ * @brief check if the given command has a relation registered 
+ * 
+ * @param command the given command 
+ * @return true if the command has a relation given 
+ * @return false if the command has no relation given 
+ */
 bool isRelCommand(Command *command)
 {
     return command->rel != NULL && command->universe != NULL;
 }
 
 // --Final functions--
+
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief null terminates the string in the given element 
+ * 
+ * @param element the given element 
  */
 void finishElement(Element *element)
 {
@@ -502,7 +546,12 @@ void finishElement(Element *element)
         element->value[element->lenght + 1] = '\0';
     }
 }
-
+/**
+ * @brief adds data row to command 
+ * 
+ * @param command the command to append row to 
+ * @param row the row that is appended 
+ */
 void addRowToCommand(Command *command, Row *row)
 {
     if (row->relation == NULL)
@@ -521,7 +570,13 @@ void addRowToCommand(Command *command, Row *row)
         command->rel = row->relation;
     }
 }
-
+/**
+ * @brief Get the Row form the data array based on position 
+ * 
+ * @param data the data array form witch we want to get he row extracted 
+ * @param value the index of the row 
+ * @return Row* pointer to the desired row 
+ */
 Row *getRow(Data *data, char *value)
 {
     if (isPositiveNumber(value))
@@ -537,11 +592,10 @@ Row *getRow(Data *data, char *value)
 }
 
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief prepares the command for execution 
+ * 
+ * @param command given command 
+ * @param data data that are passed to the command 
  */
 void finishCommand(Command *command, Data *data)
 {
@@ -568,11 +622,9 @@ void finishCommand(Command *command, Data *data)
 }
 
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief null terminates element values in a given pair
+ * 
+ * @param pair given pair to be null terminated
  */
 void finishPair(Pair *pair)
 {
@@ -581,11 +633,11 @@ void finishPair(Pair *pair)
 }
 
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief used to relaocate relation when its capacity has been reached 
+ * 
+ * @param relation the relation to be realocated 
+ * @return true if realocation was successful 
+ * @return false if it was not 
  */
 bool finishLastPair(Relation *relation)
 {
@@ -623,11 +675,12 @@ bool finishLastPair(Relation *relation)
 
 // --Parsing functions--
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief check if command has a right number of arguments 
+ * 
+ * @param command command to be checked 
+ * @param c character from data 
+ * @return true if successful 
+ * @return false on error 
  */
 bool parseToCommand(Command *command, char c)
 {
@@ -657,11 +710,12 @@ bool parseToCommand(Command *command, char c)
 }
 
 /**
- * Check if a character is in range of ASCII values
- * @param {char} ch - character to check
- * @param {int} minChar - lowest ASCII value
- * @param {int} maxChar - highest ASCII value
- * @returns {bool} true if character is in range of values
+ * @brief adds a given element to the given set 
+ * 
+ * @param set the given set 
+ * @param element the given element 
+ * @return true if successful 
+ * @return false on failure 
  */
 bool addSetElement(Set *set, Element *element)
 {
@@ -692,6 +746,14 @@ bool addSetElement(Set *set, Element *element)
     set->elements[set->size] = NULL;
     return true;
 }
+/**
+ * @brief adds character to given element
+ * 
+ * @param element element to be given the character 
+ * @param c the character to be given to the element 
+ * @return true on success 
+ * @return false on failure
+ */
 bool addCharToElement(Element *element, char c)
 {
     if (element->lenght < MAX_ELEMENT_LENGTH)
@@ -716,7 +778,16 @@ bool addCharToElement(Element *element, char c)
     return true;
 }
 
-// Returns if set has ended
+/**
+ * @brief fills the set with data 
+ * 
+ * @param set the set to be filled 
+ * @param c a character to check the termination of the element  
+ * @param data the data array to put the set into  
+ * @param file file form witch you get the data to fill the set 
+ * @return true on success 
+ * @return false on failure
+ */
 bool parseToSet(Set *set, char c, Data *data, FILE *file)
 {
     if (set == NULL)
@@ -753,7 +824,14 @@ bool parseToSet(Set *set, char c, Data *data, FILE *file)
 
     return false;
 }
-
+/**
+ * @brief fills the given relation with data 
+ * 
+ * @param relation  the given relation 
+ * @param c a character from data 
+ * @return true on success 
+ * @return false on failure
+ */
 bool parseToRelation(Relation *relation, char c)
 {
     Pair *pair = relation->pairs[relation->size];
@@ -807,6 +885,12 @@ bool parseToRelation(Relation *relation, char c)
 }
 
 // --Data processing--
+/**
+ * @brief loads the universe from the given file 
+ * 
+ * @param data  the data array in which we want to put the universe 
+ * @param file the pointer to the file of data 
+ */
 void loadUniverse(Data *data, FILE *file)
 {
     char c = getc(file);
@@ -830,7 +914,12 @@ void loadUniverse(Data *data, FILE *file)
         safeExit(data, file, 1);
     }
 }
-
+/**
+ * @brief fills the rows of data to the data array from the given file
+ * 
+ * @param file the given file 
+ * @param data the given data 
+ */
 void loadFileData(FILE *file, Data *data)
 {
     bool hasCommand = false;
@@ -936,12 +1025,20 @@ void loadFileData(FILE *file, Data *data)
 }
 
 // --Print functions--
-
+/**
+ * @brief print logical value of the input on stdout 
+ * 
+ * @param value the given expression 
+ */
 void printBool(bool value)
 {
     value ? printf("true\n") : printf("false\n");
 }
-
+/**
+ * @brief prints the universe on stdout 
+ * 
+ * @param universe the given universe 
+ */
 void printUniverse(Set *universe)
 {
     if (universe != NULL)
@@ -953,7 +1050,11 @@ void printUniverse(Set *universe)
         printf("\n");
     }
 }
-
+/**
+ * @brief prints the given set on stdout 
+ * 
+ * @param set the given set 
+ */
 void printSet(Set *set)
 {
     if (set != NULL)
@@ -965,7 +1066,11 @@ void printSet(Set *set)
         printf("\n");
     }
 }
-
+/**
+ * @brief prints the given relation on stdout 
+ * 
+ * @param relation the given relation 
+ */
 void printRelation(Relation *relation)
 {
     if (relation != NULL)
@@ -982,10 +1087,12 @@ void printRelation(Relation *relation)
 }
 
 // --Set functions--
-/*
-empty A - tiskne true nebo false podle toho, jestli je množina definovaná na øádku A prázdná nebo neprázdná.
-*/
 
+/**
+ * @brief prints true/false if the given set is empty or not 
+ * 
+ * @param com the command with data 
+ */
 void empty(Command *com)
 {
     Set *set = getUnSet(com);
@@ -999,9 +1106,11 @@ void empty(Command *com)
     printBool(com->setA->size == 0);
 }
 
-/*
-card A - tiskne poèet prvkù v množinì A (definované na øádku A).
-*/
+/**
+ * @brief prints the number of the given set 
+ * 
+ * @param com the command with the given set 
+ */
 void card(Command *com)
 {
     Set *set = getUnSet(com);
@@ -1015,9 +1124,11 @@ void card(Command *com)
     printf("%d\n", com->setA->size);
 }
 
-/*
-complement A - tiskne doplnìk množiny A.
-*/
+/**
+ * @brief prints a complement of the given set 
+ * 
+ * @param com command with the given set 
+ */
 void complement(Command *com)
 {
     Set *set = getUnSet(com);
@@ -1050,9 +1161,11 @@ void complement(Command *com)
     printf("\n");
 }
 
-/*
-union A B - tiskne sjednocení množin A a B.
-*/
+/**
+ * @brief prints the union between the two given sets 
+ * 
+ * @param com the command with the sets 
+ */
 void setUnion(Command *com)
 {
     if (!isBiCommand(com) || isRelCommand(com) || com->count - 1 > 2)
@@ -1088,9 +1201,11 @@ void setUnion(Command *com)
     printf("\n");
 }
 
-/*
-intersect A B - tiskne prùnik množin A a B.
-*/
+/**
+ * @brief prints the intersection of two given sets 
+ * 
+ * @param com the command with the two given sets 
+ */
 void intersect(Command *com)
 {
     if (!isBiCommand(com) || isRelCommand(com) || com->count - 1 > 2)
@@ -1123,9 +1238,11 @@ void intersect(Command *com)
     free(set);
 }
 
-/*
-minus A B - tiskne rozdíl množin A \ B.
-*/
+/**
+ * @brief prints the difference between the two given sets 
+ * 
+ * @param com the command with the two given sets 
+ */
 void minus(Command *com)
 {
     if (!isBiCommand(com) || isRelCommand(com) || com->count - 1 > 2)
@@ -1164,9 +1281,13 @@ void minus(Command *com)
     free(set);
 }
 
-/*
-subseteq A B - tiskne true nebo false podle toho, jestli je množina A podmnožinou množiny B.
-*/
+
+
+/**
+ * @brief prints log value based on if first set is a subset of the second set  
+ * 
+ * @param com the command with two given sets 
+ */
 void subseteq(Command *com)
 {
     if (!isBiCommand(com) || isRelCommand(com) || com->count - 1 > 2)
@@ -1196,9 +1317,11 @@ void subseteq(Command *com)
     printBool(com->setA->size <= set2->size);
 }
 
-/*
-subset A B - tiskne true nebo false, jestli je množina A vlastní podmnožina množiny B.
-*/
+/**
+ * @brief prints log value based on if the first set is owned by the second set
+ * 
+ * @param com the command with two given sets 
+ */
 void subset(Command *com)
 {
     if (!isBiCommand(com) || isRelCommand(com) || com->count - 1 > 2)
@@ -1228,9 +1351,11 @@ void subset(Command *com)
     printBool(com->setA->size < set2->size);
 }
 
-/*
-equals A B - tiskne true nebo false, jestli jsou množiny rovny.
-*/
+/**
+ * @brief prints log value based on if the sets are identical
+ * 
+ * @param com the command with two given sets 
+ */
 void equals(Command *com)
 {
     if (!isBiCommand(com) || isRelCommand(com) || com->count - 1 > 2)
@@ -1261,9 +1386,12 @@ void equals(Command *com)
 }
 
 // --Relation functions--
-/*
-reflexive R - tiskne true nebo false, jestli je relace reflexivní.
-*/
+
+/**
+ * @brief prints log value based on the reflexiveness of the given relation in command based on the given universe 
+ * 
+ * @param com the command with the relation and universe 
+ */
 void reflexive(Command *com)
 {
     if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
@@ -1275,7 +1403,7 @@ void reflexive(Command *com)
     Relation *rel = com->rel;
     Set *universe = com->universe;
 
-    // zjistim, zda je vice rel nez universe
+    
     if (rel->size < universe->size)
     {
         printBool(false);
@@ -1314,9 +1442,11 @@ void reflexive(Command *com)
     }
 }
 
-/*
-symmetric R - tiskne true nebo false, jestli je relace symetrická.
-*/
+/**
+ * @brief prints log value based on the symmetry of the given relation in command  
+ * 
+ * @param com the command with the relation
+ */
 void symmetric(Command *com)
 {
     if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
@@ -1333,18 +1463,16 @@ void symmetric(Command *com)
         dvojice[i] = 0;
     }
 
-    // vezmu prvni dvojici
     for (int i = 0; i < rel->size; i++)
     {
-        // printf("[%s, %s]\n", rel->pairs[i]->elementA->value, rel->pairs[i]->elementB->value);
-        // zjistim, zda je stejna - napr [A, A]
+        
         if (strcoll(rel->pairs[i]->elementA->value, rel->pairs[i]->elementB->value) == 0)
         {
             dvojice[i] = 1;
         }
         else
         {
-            // beru dvojici na porovnavani
+            
             for (int y = 0; y < rel->size; y++)
             {
                 if (i != y)
@@ -1373,9 +1501,11 @@ void symmetric(Command *com)
     printBool(citac == rel->size);
 }
 
-/*
-antisymmetric R - tiskne true nebo false, jestli je relace antisymetrická.
-*/
+/**
+ * @brief prints log value based on the antisymmetry of the given relation in command  
+ * 
+ * @param com the command with the relation
+ */
 void antisymmetric(Command *com)
 {
     if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
@@ -1390,7 +1520,6 @@ void antisymmetric(Command *com)
 
     for (int i = 0; i < rel->size; i++)
     {
-        // kontrola, zda nejsou stejne
         if (strcoll(rel->pairs[i]->elementA->value, rel->pairs[i]->elementB->value) != 0)
         {
             for (int y = 0; y < rel->size; y++)
@@ -1412,9 +1541,11 @@ void antisymmetric(Command *com)
     printBool(symetrie == 0);
 }
 
-/*
-transitive R - tiskne true nebo false, jestli je relace tranzitivní.
-*/
+/**
+ * @brief prints log value based on the transitiveness of the given relation in command  
+ * 
+ * @param com the command with the relation
+ */
 void transitive(Command *com)
 {
     if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
@@ -1429,7 +1560,7 @@ void transitive(Command *com)
 
     for (int i = 0; i < rel->size; i++)
     {
-        // kontrola, zda nejsou stejne
+       
         if (strcoll(rel->pairs[i]->elementA->value, rel->pairs[i]->elementB->value) != 0)
         {
             for (int y = 0; y < rel->size; y++)
@@ -1460,9 +1591,11 @@ void transitive(Command *com)
     printBool(chyba == 0);
 }
 
-/*
-function R - tiskne true nebo false, jestli je relace R funkcí.
-*/
+/**
+ * @brief prints log value based on if the given relation is a function  
+ * 
+ * @param com the command with the relation
+ */
 void function(Command *com)
 {
     if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
@@ -1495,9 +1628,11 @@ void function(Command *com)
     printBool(chyba == 0);
 }
 
-/*
-domain R - tiskne definièní obor funkce R (lze aplikovat i na relace - první prvky dvojic).
-*/
+/**
+ * @brief prints the domain set of the given relation 
+ * 
+ * @param com the command with the relation
+ */
 void domain(Command *com)
 {
     if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
@@ -1538,9 +1673,11 @@ void domain(Command *com)
     printf("\n");
 }
 
-/*
-codomain R - tiskne obor hodnot funkce R (lze aplikovat i na relace - druhé prvky dvojic).
-*/
+/**
+ * @brief prints the codomain set of the given relation 
+ * 
+ * @param com the command with the relation
+ */
 void codomain(Command *com)
 {
     if (!isRelCommand(com) || isBiCommand(com) || com->count - 1 > 1)
@@ -1581,9 +1718,13 @@ void codomain(Command *com)
     printf("\n");
 }
 
-/*
-injective R - tiskne true nebo false, jestli je funkce R injektivní.
-*/
+
+
+/**
+ * @brief prints a log value based on the injectivity of the given relation
+ * 
+ * @param com the command with the relation 
+ */
 void injective(Command *com)
 {
    if (!isRelCommand(com) || !isBiCommand(com) || com->count - 1 > 3)
@@ -1592,8 +1733,6 @@ void injective(Command *com)
         return;
     }
  Relation *rel = com->rel;
-    Set *setA=com->setA;
-    Set *setB=com->setB;
 
     //fun start 
   int ok = 1;
@@ -1606,7 +1745,7 @@ void injective(Command *com)
             {
                 if(strcoll(rel->pairs[i]->elementA->value, rel->pairs[y]->elementA->value) == 0)
                 {
-                    ok = 0; //konec
+                    ok = 0; //end
                 }
             }
         }
@@ -1615,9 +1754,11 @@ void injective(Command *com)
     printBool(ok==1);
 }
 
-/*
-surjective R - tiskne true nebo false, jestli je funkce R surjektivní.
-*/
+/**
+ * @brief prints a log value based on the surjectivity of the given relation
+ * 
+ * @param com the command with the relation 
+ */
 void surjective(Command *com)
 {
     
@@ -1627,8 +1768,8 @@ void surjective(Command *com)
         return;
     }
    Relation *rel = com->rel;
-    Set *setA=com->setA;
-    Set *setB=com->setB;
+   // Set *setA=com->setA;
+    //Set *setB=com->setB;
     //fun start 
      int ok = 1;
 
@@ -1640,7 +1781,7 @@ void surjective(Command *com)
             {
                 if(strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementB->value) == 0)
                 {
-                    ok = 0; //konec
+                    ok = 0; //end
                 }
             }
         }
@@ -1648,9 +1789,11 @@ void surjective(Command *com)
     printBool(ok==1);
 }
 
-/*
-bijective R - tiskne true nebo false, jestli je funkce R bijektivní.
-*/
+/**
+ * @brief prints a log value based on the bijectivity of the given relation
+ * 
+ * @param com the command with the relation 
+ */
 void bijective(Command *com)
 {
    if (!isRelCommand(com) || !isBiCommand(com) || com->count - 1 > 3)
@@ -1659,8 +1802,6 @@ void bijective(Command *com)
         return;
     }
     Relation *rel = com->rel;
-    Set *setA=com->setA;
-    Set *setB=com->setB;
     //fun start 
    int ok = 1;
 
@@ -1672,12 +1813,12 @@ void bijective(Command *com)
             {
                 if(strcoll(rel->pairs[i]->elementA->value, rel->pairs[y]->elementA->value) == 0)
                 {
-                    ok = 0; //konec
+                    ok = 0; //end
                 }
                 
                 if(strcoll(rel->pairs[i]->elementB->value, rel->pairs[y]->elementB->value) == 0)
                 {
-                    ok = 0; //konec
+                    ok = 0; //end
                 }
             }
         }
@@ -1686,6 +1827,15 @@ void bijective(Command *com)
 }
 
 // Command functions
+
+/**
+ * @brief lookups the function based on command given ad executes it 
+ * 
+ * @param functions the array of function pointers with the string names 
+ * @param com the given command 
+ * @return true if the function was found 
+ * @return false if it was not found
+ */
 bool functionLookup(Function *functions, Command *com)
 {
     for (int i = 0; i < FUNCTION_COUNT; i++)
@@ -1706,7 +1856,11 @@ bool functionLookup(Function *functions, Command *com)
     fprintf(stderr, "Function %s not found", com->data[0].value);
     return false;
 }
-
+/**
+ * @brief initializes the function array 
+ * 
+ * @param functions array pointer to initialize 
+ */
 void initFunctions(Function *functions)
 {
     // unsetfun
